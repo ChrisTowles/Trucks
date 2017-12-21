@@ -1,0 +1,60 @@
+<nav class="navbar navbar-dark bg-primary navbar-fixed-top navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" [routerLink]="['/']" (click)="navbarCollapsed = true">Craigmyle Trucks</a>
+
+    <button class="navbar-toggler navbar-toggler-right" type="button"
+            (click)="navbarCollapsed = !navbarCollapsed"
+            [attr.aria-expanded]="!navbarCollapsed" aria-controls="navbarContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse" [ngbCollapse]="navbarCollapsed" id="navbarContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/inventory']" (click)="navbarCollapsed = true">Inventory</a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/directions']" (click)="navbarCollapsed = true">Directions</a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/about']" (click)="navbarCollapsed = true">About Us</a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/contact']" (click)="navbarCollapsed = true">Contact Us</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0 d-none d-lg-inline" novalidate [formGroup]="searchForm">
+        <div class="input-group">
+          <input class="form-control" type="search" formControlName="searchText" placeholder="Search"
+                 aria-label="Search">
+          <span class="input-group-btn">
+            <button class="btn btn-secondary my-2 my-sm-0" (click)="search()">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+          </span>
+        </div>
+      </form>
+      <ul class="navbar-nav">
+        <li class="nav-item" *ngIf="!authService.isLoggedIn()">
+          <a class="nav-link" (click)="signInWithGoogle()">Sign In</a>
+        </li>
+        <li class="nav-item" *ngIf="authService.isLoggedIn()">
+          <a class="nav-link" (click)="authService.logout()">Sign Out
+            <!--<img class="account-img "-->
+            <!--[src]="authService.user?.photoURL"-->
+            <!--alt="{{ authService.user?.displayName }}">-->
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<section class="progress-bar">
+  <!--<mat-progress-bar-->
+  <!--[color]="'primary'"-->
+  <!--[mode]="progressBarMode">-->
+  <!--</mat-progress-bar>-->
+</section>
+

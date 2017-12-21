@@ -1,27 +1,52 @@
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import {async, TestBed} from '@angular/core/testing';
+import {AppComponent} from './app.component';
+import {APP_BASE_HREF} from '@angular/common';
+import {TestsModule} from './shared/modules/tests.module';
+import {AppRoutingModule} from './app-routing.module';
+import {TruckTopComponent} from './trucks/truck-top/truck-top.component';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {APP_CONFIG, AppConfig} from './config/app.config';
+import {TruckService} from './trucks/shared/truck.service';
+import {Error404Component} from './core/error404/error-404.component';
+
 describe('AppComponent', () => {
+  let fixture;
+  let component;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
+      imports: [
+        TestsModule,
+        AppRoutingModule
       ],
+      declarations: [
+        AppComponent,
+        TruckTopComponent,
+        Error404Component
+      ],
+      providers: [
+        {provide: APP_CONFIG, useValue: AppConfig},
+        {provide: APP_BASE_HREF, useValue: '/'},
+        TruckService
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
-  it('should create the app', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
-  }));
-  it(`should have as title 'app'`, async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('app');
-  }));
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
+
+    fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to app!');
+    component = fixture.debugElement.componentInstance;
+  }));
+
+  it('should create the app', (() => {
+    expect(component).toBeTruthy();
+  }));
+
+  it('should change title meta tag in root path', async(() => {
+    fixture.detectChanges();
+    expect(component.title.getTitle()).toBe('Angular Example App');
+  }));
+
+  it('should check browser features', (() => {
+    expect(component.checkBrowserFeatures()).toBeTruthy();
   }));
 });

@@ -1,0 +1,121 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <ol class="breadcrumb mt-2">
+        <li class="breadcrumb-item"><a [routerLink]="['/inventory']">Inventory</a></li>
+        <li class="breadcrumb-item"><a [routerLink]="['/inventory', id ]">{{ (item | async)?.name }}</a>
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+      </ol>
+    </div>
+  </div>
+
+  <h1 class="modal-title">Editing <span class="text-info">{{ (item | async)?.name }}</span></h1>
+
+  <div class="alert alert-info">
+    <strong>Heads up!!</strong>
+    Image changes happen instantly and can not be undone!
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <input type="file" class="form-control-file" (change)="uploadFile($event)"/>
+      <ngb-progressbar [value]="uploadPercent | async"></ngb-progressbar>
+    </div>
+  </div>
+
+  <div class="row" [dragula]="'images'" [dragulaModel]="images">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3" *ngFor="let img of images; let i = index ">
+      <div class="card border-secondary" [ngClass]="{'border-primary': i === 0, 'border-secondary': i !== 0 }">
+
+        <img class="card-img-top" src="{{ img.url }}"
+             alt="">
+        <div class="card-body">
+          <p>{{ img.id }}</p>
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-danger" (click)="deleteImage(img)">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr class="my-4">
+  <div class="row">
+    <div class="col">
+      <form [formGroup]="itemForm" novalidate>
+        <div class="row">
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label>Name</label>
+              <input class="form-control" formControlName="name">
+            </div>
+            <div class="form-group">
+              <label>Engine Make</label>
+              <input class="form-control" formControlName="engineMake">
+            </div>
+            <div class="form-group">
+              <label>Engine Model</label>
+              <input class="form-control" formControlName="engineModel">
+            </div>
+            <div class="form-group">
+              <label>Engine HP</label>
+              <input class="form-control" formControlName="engineHP">
+            </div>
+            <div class="form-group">
+              <label>Transmission</label>
+              <input class="form-control" formControlName="transmission">
+            </div>
+            <div class="form-group">
+              <label>Suspension</label>
+              <input class="form-control" formControlName="suspension">
+            </div>
+            <div class="form-group">
+              <label>Rear End Ratio</label>
+              <input class="form-control" formControlName="rearEndRatio">
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label>Stock #</label>
+              <input class="form-control" formControlName="stockNumber">
+            </div>
+            <div class="form-group">
+              <label>GVWR</label>
+              <input class="form-control" formControlName="gvwr">
+            </div>
+            <div class="form-group">
+              <label>Bed Dimensions</label>
+              <input class="form-control" formControlName="bedDimensions">
+            </div>
+            <div class="form-group">
+              <label>Wheel Base</label>
+              <input class="form-control" formControlName="wheelBase">
+            </div>
+            <div class="form-group">
+              <label>Odometer</label>
+              <input class="form-control" formControlName="odometer">
+            </div>
+            <div class="form-group">
+              <label>Price</label>
+              <input class="form-control" formControlName="gvwr">
+            </div>
+            <div class="form-group">
+              <label>Comments</label>
+              <textarea class="form-control" formControlName="comments"></textarea>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button type="button" class="btn btn-primary btn-block" (click)="save()">Save</button>
+    </div>
+  </div>
+
+
+</div>
+

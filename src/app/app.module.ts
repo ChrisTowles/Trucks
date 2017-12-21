@@ -1,18 +1,85 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
+import {AppRoutingModule} from './app-routing.module';
+import {CoreModule} from './core/core.module';
 
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {ProgressBarService} from './core/progress-bar.service';
+import {ProgressInterceptor} from './shared/interceptors/progress.interceptor';
+import {TimingInterceptor} from './shared/interceptors/timing.interceptor';
 
+import {environment} from '../environments/environment';
+import {AngularFireModule} from 'angularfire2';
+import {AngularFirestoreModule} from 'angularfire2/firestore';
+import {AngularFireAuthModule} from 'angularfire2/auth';
+import {AngularFireDatabaseModule} from 'angularfire2/database';
+import {AngularFireStorageModule} from 'angularfire2/storage';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+
+import {AuthService} from './core/auth.service';
+
+import {HomeComponent} from './home/home.component';
+import {AboutComponent} from './about/about.component';
+import {ContactComponent} from './contact/contact.component';
+import {DirectionsComponent} from './directions/directions.component';
+
+import {InventoryComponent} from './inventory/inventory.component';
+import {InventoryListComponent} from './inventory/inventory-list/inventory-list.component';
+import {InventoryDetailComponent} from './inventory/inventory-detail/inventory-detail.component';
+import {InventoryEditComponent} from './inventory/inventory-edit/inventory-edit.component';
+import {InventoryEquipmentComponent} from './inventory/inventory-equipment.component';
+import {InventoryDeleteComponent} from './inventory/inventory-delete/inventory-delete.component';
+import {NgxGalleryModule} from 'ngx-gallery';
+import {DragulaModule} from 'ng2-dragula';
+import {CloudinaryConfiguration, CloudinaryModule} from '@cloudinary/angular-5.x';
+import {Cloudinary} from 'cloudinary-core';
+import {FileUploadModule} from 'ng2-file-upload';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    AppRoutingModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireDatabaseModule,
+    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
+    AngularFireAuthModule, // imports firebase/auth, only needed for auth features
+    AngularFireStorageModule,
+    NgbModule.forRoot(),
+    CoreModule,
+    NgxGalleryModule,
+    DragulaModule,
+    CloudinaryModule.forRoot({Cloudinary}, {cloud_name: 'slyedoc'} as CloudinaryConfiguration),
+    FileUploadModule
   ],
-  providers: [],
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    AboutComponent,
+    ContactComponent,
+    InventoryComponent,
+    InventoryListComponent,
+    InventoryDetailComponent,
+    InventoryEditComponent,
+    InventoryEquipmentComponent,
+    InventoryDeleteComponent,
+    DirectionsComponent
+  ],
+  providers: [
+    AuthService,
+    {provide: HTTP_INTERCEPTORS, useClass: ProgressInterceptor, multi: true, deps: [ProgressBarService]},
+    {provide: HTTP_INTERCEPTORS, useClass: TimingInterceptor, multi: true}
+  ],
+  entryComponents: [InventoryDeleteComponent],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+
+export class AppModule {
+}

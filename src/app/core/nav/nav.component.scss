@@ -1,0 +1,15 @@
+.account-img {
+  border-radius: 50%;
+  display: inline;
+  margin: -1px;
+  overflow: hidden;
+  position: relative;
+  height: 32px;
+  width: 32px;
+  z-index: 0;
+}
+
+// Hack to fix issue with all list items after the first getting shifted
+.nav-item + .nav-item {
+  margin-left: 0px;
+}

@@ -1,0 +1,57 @@
+<div class="jumbotron">
+
+  <!--<img class="bd-booticon" src="assets/img/logo.jpg" alt="logo"/>-->
+  <h1 class="display-3 dis">
+    Craigmyle Truck & Trailer Sales Inc
+  </h1>
+  <p class="lead">
+    Thank you for visiting. If you’re looking for a good deal on quality used trucks &
+    trailers, you’ve come to the right place!
+  </p>
+  <hr class="my-4">
+  <p class="lead text-center">
+    <a
+      class="btn btn-outline-primary"
+      [routerLink]="['/inventory']">View Inventory</a>
+    <a
+      class="btn btn-outline-primary"
+      [routerLink]="['/contact']">Contact Us</a>
+  </p>
+</div>
+
+<section class="container">
+  <div class="row">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3"
+         *ngFor="let item of inventory | async; let i = index ">
+      <div class="card border-primary h-100">
+        <a [routerLink]="['inventory', item.id]">
+          <img class="card-img-top" src="{{ 'http://lorempixel.com/400/200/transport/' + i }}"
+               alt="Card image cap">
+        </a>
+        <div class="card-body">
+          <h4 class="card-title">{{ item.name }}</h4>
+          <div class="row">
+            <div class="col-6">Engine</div>
+            <div class="col-6">{{item.engineMake}}</div>
+          </div>
+          <div class="row">
+            <div class="col-6">Trans</div>
+            <div class="col-6">{{item.transmission}}</div>
+          </div>
+          <div class="row">
+            <div class="col-6">Susp</div>
+            <div class="col-6">{{item.suspension}}</div>
+          </div>
+          <div class="row">
+            <div class="col-6">Miles</div>
+            <div class="col-6">{{item.odometer}}</div>
+          </div>
+          <div class="row">
+            <div class="col-6">Price</div>
+            <div class="col-6">{{item.price}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
