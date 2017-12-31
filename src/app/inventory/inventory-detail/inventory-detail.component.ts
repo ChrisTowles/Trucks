@@ -8,6 +8,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from '../../core/auth.service';
 import {NgxGalleryImage, NgxGalleryOptions} from 'ngx-gallery';
 import {EquipmentImage} from '../../core/equipment-image.model';
+import {Cloudinary} from '@cloudinary/angular-5.x';
 
 @Component({
   selector: 'app-inventory-detail',
@@ -27,6 +28,7 @@ export class InventoryDetailComponent implements OnInit {
               private afs: AngularFirestore,
               private router: Router,
               private modalService: NgbModal,
+              private cloudinary: Cloudinary,
               private authService: AuthService) {
 
 
@@ -39,10 +41,10 @@ export class InventoryDetailComponent implements OnInit {
       {
         width: '100%',
         height: '600px',
-        imagePercent: 80,
-        thumbnailsPercent: 20,
-        thumbnailsMargin: 20,
-        thumbnailMargin: 20
+        thumbnails: true,
+        thumbnailsRows: 2,
+        previewSwipe: true,
+        previewZoom: true
       }
     ];
 
@@ -63,9 +65,10 @@ export class InventoryDetailComponent implements OnInit {
         images.forEach(img => {
           console.log('img', img);
           this.galleryImages.push({
-            small: img.url,
-            medium: img.url,
-            big: img.url
+            small: this.cloudinary.url(img.public_id, {height: 256, crop: 'fill'}),
+            medium: this.cloudinary.url(img.public_id, {height: 512, crop: 'fill'}),
+            big: this.cloudinary.url(img.public_id, {height: 1024, crop: 'fill'}),
+            url: img.url
           });
         });
       });

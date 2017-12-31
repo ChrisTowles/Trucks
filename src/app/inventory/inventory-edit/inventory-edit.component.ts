@@ -4,15 +4,16 @@ import {Equipment} from '../../core/equipment.model';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
-import {AngularFireStorage} from 'angularfire2/storage';
 import {EquipmentImage, EquipmentImageId} from '../../core/equipment-image.model';
-import {DragulaService} from 'ng2-dragula';
+import {FileUploader, FileUploaderOptions, ParsedResponseHeaders} from 'ng2-file-upload';
+import {Cloudinary} from '@cloudinary/angular-5.x';
 
 @Component({
   selector: 'app-inventory-edit',
   templateUrl: './inventory-edit.component.html',
   styleUrls: ['./inventory-edit.component.scss']
 })
+
 export class InventoryEditComponent implements OnInit {
   private itemDoc: AngularFirestoreDocument<Equipment>;
   item: Observable<Equipment>;
@@ -22,27 +23,21 @@ export class InventoryEditComponent implements OnInit {
   downloadURL: Observable<string>;
   itemForm: FormGroup;
   id: string;
+  responses: Array<any>;
+
+  public uploader: FileUploader;
 
   constructor(private afs: AngularFirestore,
-              private storage: AngularFireStorage,
               private fb: FormBuilder,
               private router: Router,
-              private dragulaService: DragulaService,
-              private activatedRoute: ActivatedRoute) {
+              private activatedRoute: ActivatedRoute,
+              private cloudinary: Cloudinary) {
 
+    this.responses = [];
     this.createForm();
 
-    // Return image to last location and dropped outside of row
-    this.dragulaService.setOptions('images', {
-      revertOnSpill: true
-    });
+    this.cloudinary.url()
 
-    this.dragulaService.dropModel.subscribe((value) => {
-      console.log(value);
-      if (value[0] === 'images') {
-        this.onImageDrop(value.slice(1));
-      }
-    });
   }
 
 
@@ -61,18 +56,10 @@ export class InventoryEditComponent implements OnInit {
       wheelBase: '',
       odometer: '',
       price: '',
-      comments: ''
+      comments: '',
+      status: ''
     });
   }
-
-  private onImageDrop(args) {
-    const [e, el, source] = args;
-    console.log('e', e);
-    console.log('el', el);
-    console.log('source', source);
-    // do something
-  }
-
 
   ngOnInit() {
     // subscribe to router event
@@ -96,7 +83,67 @@ export class InventoryEditComponent implements OnInit {
             return {id, ...data};
           });
         });
+
+      this.setupUploader();
     });
+  }
+
+  private setupUploader() {
+
+    const uploaderOptions: FileUploaderOptions = {
+      url: `https://api.cloudinary.com/v1_1/${this.cloudinary.config().cloud_name}/upload`,
+      // Upload files automatically upon addition to upload queue
+      autoUpload: true,
+      // Use xhrTransport in favor of iframeTransport
+      isHTML5: true,
+      // Calculate progress independently for each uploaded file
+      removeAfterUpload: true,
+      // XHR request headers
+      headers: [
+        {
+          name: 'X-Requested-With',
+          value: 'XMLHttpRequest'
+        }
+      ]
+    };
+    this.uploader = new FileUploader(uploaderOptions);
+
+    this.uploader.onBuildItemForm = (fileItem: any, form: FormData): any => {
+      // Add Cloudinary's unsigned upload preset to the upload form
+      form.append('upload_preset', this.cloudinary.config().upload_preset);
+      // Add built-in and custom tags for displaying the uploaded photo in the list
+      const tags = `${this.id}`;
+
+      // Upload to a custom folder
+      // Note that by default, when uploading via the API, folders are not automatically created in your Media Library.
+      // In order to automatically create the folders based on the API requests,
+      // please go to your account upload settings and set the 'Auto-create folders' option to enabled.
+      form.append('folder', `${this.id}`);
+      // Add custom tags
+      form.append('tags', tags);
+      // Add file to upload
+      form.append('file', fileItem);
+
+      // Use default "withCredentials" value for CORS requests
+      fileItem.withCredentials = false;
+      return {fileItem, form};
+    };
+
+    // Update model on completion of uploading a file
+    this.uploader.onCompleteItem = (item: any, response: string, status: number, headers: ParsedResponseHeaders) => {
+      const data = JSON.parse(response);
+      console.log(data);
+
+      const imgDoc = this.afs.doc<EquipmentImage>(`inventory/${this.id}/images/${data.original_filename}`);
+      imgDoc.set({
+        url: data.secure_url,
+        public_id: data.public_id,
+        height: data.height,
+        width: data.width,
+        bytes: data.width,
+        order: this.images.length
+      });
+    };
   }
 
   save() {
@@ -106,34 +153,9 @@ export class InventoryEditComponent implements OnInit {
       });
   }
 
-  uploadFile(event) {
-    const file = event.target.files[0];
-    const filePath = `inventory/${this.id}/${file.name}`;
-    const task = this.storage.upload(filePath, file);
-
-
-    this.uploadPercent = task.percentageChanges();
-
-    // get notified when the download URL is available
-    this.downloadURL = task.downloadURL();
-
-
-    // this.downloadURL.subscribe(url => {
-    //   console.log('wrong', url); // will be null on large files larger then a few kb
-    // });
-
-    task.then().then(a => {
-      const imgDoc = this.afs.doc<EquipmentImage>(`inventory/${this.id}/images/${file.name}`);
-      imgDoc.set({
-        url: a.metadata.downloadURLs[0]
-      });
-    });
-
-  }
-
   deleteImage(img: EquipmentImageId) {
-    this.imageCollection.doc(img.id).delete().then((value => {
-      this.storage.ref(`inventory/${this.id}/${img.id}`).delete();
-    }));
+    // We can't delete from cloudinary, file is left there, we will delete it from db
+    this.imageCollection.doc(img.id).delete();
   }
+
 }

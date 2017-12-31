@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {Equipment, EquipmentId} from '../../core/equipment.model';
+import {Equipment, EquipmentId, EquipmentStatus} from '../../core/equipment.model';
 import {Observable} from 'rxjs/Observable';
 import {ActivatedRoute, Router} from '@angular/router';
 import {InventoryDeleteComponent} from '../inventory-delete/inventory-delete.component';
@@ -77,7 +77,7 @@ export class InventoryListComponent {
   }
 
   add() {
-    this.inventoryCollection.add({name: 'New Equipment'} as Equipment)
+    this.inventoryCollection.add({name: 'New Equipment', status: EquipmentStatus.Hidden} as Equipment)
       .then(value => {
         this.router.navigate(['inventory', value.id, 'edit']);
       });

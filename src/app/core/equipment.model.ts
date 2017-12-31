@@ -1,4 +1,5 @@
 export interface Equipment {
+
   stockNumber: string;
   name: string;
   engineMake: string;
@@ -14,8 +15,18 @@ export interface Equipment {
   price: number;
   comments: string;
   img: string;
+
+  // Internal
+  order: number;
+  status: EquipmentStatus;
 }
 
 export interface EquipmentId extends Equipment {
   id: string;
+}
+
+export enum EquipmentStatus {
+  Hidden = 0,
+  Visible = 1,
+  Sale = 2,
 }

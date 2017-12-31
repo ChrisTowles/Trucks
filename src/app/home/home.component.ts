@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {Equipment, EquipmentId} from '../core/equipment.model';
+import {Equipment, EquipmentId, EquipmentStatus} from '../core/equipment.model';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
@@ -17,7 +17,10 @@ export class HomeComponent implements OnInit {
   constructor(private afs: AngularFirestore,
               private router: Router) {
 
-    this.inventoryCollection = afs.collection<Equipment>('inventory');
+    this.inventoryCollection = afs.collection<Equipment>('inventory', ref => ref
+      .where('status', '>', EquipmentStatus.Hidden)
+      .limit(5)
+    );
     this.inventory = this.inventoryCollection.snapshotChanges().map(actions => {
       return actions.map(a => {
         const data = a.payload.doc.data() as Equipment;

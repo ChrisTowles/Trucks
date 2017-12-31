@@ -34,7 +34,6 @@ import {InventoryEditComponent} from './inventory/inventory-edit/inventory-edit.
 import {InventoryEquipmentComponent} from './inventory/inventory-equipment.component';
 import {InventoryDeleteComponent} from './inventory/inventory-delete/inventory-delete.component';
 import {NgxGalleryModule} from 'ngx-gallery';
-import {DragulaModule} from 'ng2-dragula';
 import {CloudinaryConfiguration, CloudinaryModule} from '@cloudinary/angular-5.x';
 import {Cloudinary} from 'cloudinary-core';
 import {FileUploadModule} from 'ng2-file-upload';
@@ -55,8 +54,7 @@ import {FileUploadModule} from 'ng2-file-upload';
     NgbModule.forRoot(),
     CoreModule,
     NgxGalleryModule,
-    DragulaModule,
-    CloudinaryModule.forRoot({Cloudinary}, {cloud_name: 'slyedoc'} as CloudinaryConfiguration),
+    CloudinaryModule.forRoot({Cloudinary}, environment.cloudinary as CloudinaryConfiguration),
     FileUploadModule
   ],
   declarations: [
