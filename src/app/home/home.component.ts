@@ -1,8 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {Equipment, EquipmentId, EquipmentStatus} from '../core/equipment.model';
-import {Router} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
+import {Meta, Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -11,23 +8,19 @@ import {Observable} from 'rxjs/Observable';
 })
 export class HomeComponent implements OnInit {
 
-  private inventoryCollection: AngularFirestoreCollection<Equipment>;
-  inventory: Observable<EquipmentId[]>;
 
-  constructor(private afs: AngularFirestore,
-              private router: Router) {
+  constructor(private meta: Meta, private title: Title) {
 
-    this.inventoryCollection = afs.collection<Equipment>('inventory', ref => ref
-      .where('status', '>', EquipmentStatus.Hidden)
-      .limit(5)
-    );
-    this.inventory = this.inventoryCollection.snapshotChanges().map(actions => {
-      return actions.map(a => {
-        const data = a.payload.doc.data() as Equipment;
-        const id = a.payload.doc.id;
-        return {id, ...data};
-      });
-    });
+    this.title.setTitle('Craigmyle Trucks - Home');
+    this.meta.addTags([
+      {name: 'description', content: 'Home Page for Craigmyle Trucks'},
+      {name: 'og:title', content: 'Craigmyle Trucks - Home'},
+      {
+        name: 'og:description',
+        content: 'If you’re looking for a good deal on quality used trucks & trailers, you’ve come to the right place!'
+      },
+      {name: 'og:type', content: 'website'}
+    ]);
   }
 
   ngOnInit() {

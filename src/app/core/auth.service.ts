@@ -12,7 +12,7 @@ import * as _ from 'lodash';
 
 @Injectable()
 export class AuthService {
-  user: Observable<User>;
+  user: Observable<User> = null;
   userRoles: Array<string>;
 
   constructor(private afs: AngularFirestore,
@@ -80,7 +80,7 @@ export class AuthService {
 
   isAdmin(): boolean {
     const allowed = ['admin'];
-    return this.matchingRole(allowed);
+    return this.isLoggedIn() && this.matchingRole(allowed);
   }
 
   // Determine if any matching roles exist

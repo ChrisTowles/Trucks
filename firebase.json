@@ -9,7 +9,7 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "function": "ssrapp"
       }
     ]
   },
@@ -19,5 +19,9 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "functions": {
+    "preserve": "npm --prefix functions run build",
+    "predeploy": "npm --prefix functions run build"
   }
 }

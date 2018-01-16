@@ -1,80 +1,78 @@
-<div class="container" *ngIf="item$ | async as item">
-
+<div class="container" *ngIf="item">
   <div class="row">
     <div class="col">
       <ol class="breadcrumb mt-2">
         <li class="breadcrumb-item"><a [routerLink]="['/inventory']">Inventory</a></li>
-        <li class="breadcrumb-item active">{{item.name}}</li>
+        <li class="breadcrumb-item active">{{ item.year ? item.year + ' ' : '' }}{{item.name}}</li>
       </ol>
     </div>
   </div>
-
-  <h1>{{ item.name || item.id }}</h1>
-  <h4>{{ item.price }}</h4>
-
+  <h1>{{ item.year ? item.year + ' ' : '' }}{{ item.name || item.id }}</h1>
   <div class="row">
     <div class="col-12 col-md-6">
       <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
     </div>
     <div class="col-12 col-md-6">
       <div class="row">
-        <div class="col-6">Stock Number</div>
+        <div class="col-6 text-right"><strong>Price</strong></div>
+        <div class="col-6">{{item.price | currency:'USD':'symbol':'1.0-2' }}</div>
+      </div>
+      <div class="row">
+        <div class="col-6 text-right"><strong>Stock Number</strong></div>
         <div class="col-6">{{item.stockNumber}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Engine</div>
+        <div class="col-6 text-right"><strong>Engine</strong></div>
         <div class="col-6">{{item.engineMake}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Engine Model</div>
+        <div class="col-6 text-right"><strong>Engine Model</strong></div>
         <div class="col-6">{{item.engineModel}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Engine HP</div>
+        <div class="col-6 text-right"><strong>Engine HP</strong></div>
         <div class="col-6">{{item.engineHP}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Transmission</div>
+        <div class="col-6 text-right"><strong>Transmission</strong></div>
         <div class="col-6">{{item.transmission}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Suspension</div>
+        <div class="col-6 text-right"><strong>Suspension</strong></div>
         <div class="col-6">{{item.suspension}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Rear End Ratio</div>
+        <div class="col-6 text-right"><strong>Rear End Ratio</strong></div>
         <div class="col-6">{{item.rearEndRatio}}</div>
       </div>
       <div class="row">
-        <div class="col-6">GVWR</div>
+        <div class="col-6 text-right"><strong>GVWR</strong></div>
         <div class="col-6">{{item.gvwr}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Bed Dimensions</div>
+        <div class="col-6 text-right"><strong>Bed Dimensions</strong></div>
         <div class="col-6">{{item.bedDimensions}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Wheel Base</div>
+        <div class="col-6 text-right"><strong>Wheel Base</strong></div>
         <div class="col-6">{{item.wheelBase}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Odometer</div>
+        <div class="col-6 text-right"><strong>Odometer</strong></div>
         <div class="col-6">{{item.odometer}}</div>
       </div>
       <div class="row">
-        <div class="col-6">Miles</div>
-        <div class="col-6">{{item.odometer}}</div>
-      </div>
-      <div class="row">
-        <div class="col-12">Comments</div>
-        <div class="col-12">{{item.comments}}</div>
+        <div class="col-12"><strong>Comments</strong></div>
+        <div class="col-12"><p>{{item.comments}}</p></div>
       </div>
 
-      <div class="row pt-2" *ngIf="authService.isAdmin()">
-        <div class="col">
-          <button type="button" class="btn btn-danger" (click)="delete()">Delete</button>
-          <a class="btn btn-primary" [routerLink]="['edit']">Edit</a>
-        </div>
+      <a class="btn btn-primary btn-block" [routerLink]="['/contact']"
+         [queryParams]="{subject: item.stockNumber ? 'Interest in #' + item.stockNumber: ''}">Contact Us
+      </a>
+
+      <div class="btn-group d-flex pt-2" *ngIf="authService.isAdmin()">
+        <a class="btn btn-primary w-100" [routerLink]="['edit']">Edit</a>
+        <button type="button" class="btn btn-danger w-100" (click)="delete()">Delete</button>
       </div>
     </div>
   </div>

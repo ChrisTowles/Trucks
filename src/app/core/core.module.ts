@@ -7,11 +7,13 @@ import {throwIfAlreadyLoaded} from './module-import-guard';
 import {LoggerService} from './logger.service';
 
 import {NavComponent} from './nav/nav.component';
+import {FooterComponent} from './footer/footer.component';
 import {RouterModule} from '@angular/router';
 import {Error404Component} from './error404/error-404.component';
 import {ProgressBarService} from './progress-bar.service';
 import {AuthService} from './auth.service';
 import {NgbCollapseModule} from '@ng-bootstrap/ng-bootstrap';
+import {AuthGuard} from './auth.guard';
 
 
 @NgModule({
@@ -24,15 +26,18 @@ import {NgbCollapseModule} from '@ng-bootstrap/ng-bootstrap';
   ],
   exports: [
     NavComponent,
+    FooterComponent
   ],
   declarations: [
     NavComponent,
+    FooterComponent,
     Error404Component
   ],
   providers: [
     LoggerService,
     ProgressBarService,
-    AuthService
+    AuthService,
+    AuthGuard
   ]
 })
 

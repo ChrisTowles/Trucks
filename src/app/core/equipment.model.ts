@@ -2,6 +2,7 @@ export interface Equipment {
 
   stockNumber: string;
   name: string;
+  year: string;
   engineMake: string;
   engineModel: string;
   engineHP: number;
@@ -14,7 +15,7 @@ export interface Equipment {
   odometer: number;
   price: number;
   comments: string;
-  img: string;
+  img_public_id: string;
 
   // Internal
   order: number;

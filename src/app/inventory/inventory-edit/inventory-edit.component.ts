@@ -16,11 +16,12 @@ import {Cloudinary} from '@cloudinary/angular-5.x';
 
 export class InventoryEditComponent implements OnInit {
   private itemDoc: AngularFirestoreDocument<Equipment>;
-  item: Observable<Equipment>;
+  item$: Observable<Equipment>;
+  item: Equipment;
   private imageCollection: AngularFirestoreCollection<EquipmentImage>;
+  images$: Observable<EquipmentImageId[]>;
   images: EquipmentImageId[];
-  uploadPercent: Observable<number>;
-  downloadURL: Observable<string>;
+  imageOrderMax = 0;
   itemForm: FormGroup;
   id: string;
   responses: Array<any>;
@@ -35,15 +36,12 @@ export class InventoryEditComponent implements OnInit {
 
     this.responses = [];
     this.createForm();
-
-    this.cloudinary.url()
-
   }
-
 
   createForm() {
     this.itemForm = this.fb.group({ // <-- the parent FormGroup
       name: ['', Validators.required],
+      year: '',
       stockNumber: '',
       engineMake: '',
       engineModel: '',
@@ -66,22 +64,39 @@ export class InventoryEditComponent implements OnInit {
     this.activatedRoute.parent.params.subscribe((params: Params) => {
       this.id = params['id'];
 
-      // get item and update form
+      // get item$ and update form
       this.itemDoc = this.afs.doc<Equipment>(`inventory/${this.id}`);
-      this.item = this.itemDoc.valueChanges()
+      this.item$ = this.itemDoc.valueChanges()
         .do(data => {
+          this.item = data;
           this.itemForm.patchValue(data);
         });
 
       // get images
-      this.imageCollection = this.afs.collection<EquipmentImage>(`inventory/${this.id}/images`);
-      this.imageCollection.snapshotChanges()
-        .subscribe(actions => {
-          this.images = actions.map(a => {
-            const data = a.payload.doc.data() as EquipmentImage;
-            const id = a.payload.doc.id;
-            return {id, ...data};
-          });
+      this.imageCollection = this.afs.collection<EquipmentImage>(`inventory/${this.id}/images`, ref => ref.orderBy('order', 'asc'));
+      this.images$ = this.imageCollection.snapshotChanges()
+        .map(actions => {
+          return actions
+            .map(a => {
+              const data = a.payload.doc.data() as EquipmentImage;
+              const id = a.payload.doc.id;
+              return {id, ...data};
+            });
+        })
+        .do(images => {
+          this.images = images;
+
+          // Save the current max order, if not set start at -1 so first will be 0
+          if (images.length === 0) {
+            this.imageOrderMax = -1;
+          } else {
+            this.imageOrderMax = images[images.length - 1].order;
+
+            // Check if primary image needs to be updated
+            if (this.item.img_public_id !== images[0].public_id) {
+              this.itemDoc.update({img_public_id: images[0].public_id});
+            }
+          }
         });
 
       this.setupUploader();
@@ -132,8 +147,13 @@ export class InventoryEditComponent implements OnInit {
     // Update model on completion of uploading a file
     this.uploader.onCompleteItem = (item: any, response: string, status: number, headers: ParsedResponseHeaders) => {
       const data = JSON.parse(response);
-      console.log(data);
 
+      // If first Image set the main image
+      if (this.imageOrderMax === -1) {
+        this.itemDoc.update({img_public_id: data.public_id});
+      }
+
+      // Add to image collection
       const imgDoc = this.afs.doc<EquipmentImage>(`inventory/${this.id}/images/${data.original_filename}`);
       imgDoc.set({
         url: data.secure_url,
@@ -141,8 +161,9 @@ export class InventoryEditComponent implements OnInit {
         height: data.height,
         width: data.width,
         bytes: data.width,
-        order: this.images.length
+        order: ++this.imageOrderMax // due to delay in local update, increase this locally and it will be updated again later by server
       });
+
     };
   }
 
@@ -153,9 +174,25 @@ export class InventoryEditComponent implements OnInit {
       });
   }
 
-  deleteImage(img: EquipmentImageId) {
+  deleteImage(img: EquipmentImageId, index: number) {
     // We can't delete from cloudinary, file is left there, we will delete it from db
-    this.imageCollection.doc(img.id).delete();
+    this.imageCollection.doc(img.id).delete().then(() => {
+      // Replace primary image if first was deleted
+      if (index === 0 && this.images.length > 0) {
+        this.itemDoc.update({img_public_id: this.images[0].public_id});
+      } else {
+        this.itemDoc.update({img_public_id: null});
+      }
+    });
   }
 
+  moveImageUp(img: EquipmentImageId, target: EquipmentImageId, img_public_id: string) {
+    this.imageCollection.doc(target.id).update({order: img.order});
+    this.imageCollection.doc(img.id).update({order: target.order});
+  }
+
+  moveImageDown(img: EquipmentImageId, target: EquipmentImageId, img_public_id: string) {
+    this.imageCollection.doc(target.id).update({order: img.order});
+    this.imageCollection.doc(img.id).update({order: target.order});
+  }
 }

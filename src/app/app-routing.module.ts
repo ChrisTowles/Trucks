@@ -10,6 +10,8 @@ import {InventoryEquipmentComponent} from './inventory/inventory-equipment.compo
 import {ContactComponent} from './contact/contact.component';
 import {AboutComponent} from './about/about.component';
 import {DirectionsComponent} from './directions/directions.component';
+import {AdminComponent} from './admin/admin.component';
+import {AuthGuard} from './core/auth.guard';
 
 const routes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
@@ -17,6 +19,7 @@ const routes: Routes = [
   {path: 'directions', component: DirectionsComponent},
   {path: 'contact', component: ContactComponent},
   {path: 'about', component: AboutComponent},
+  {path: 'admin', component: AdminComponent, canActivate: [AuthGuard]},
   {
     path: 'inventory',
     component: InventoryComponent,
@@ -27,7 +30,9 @@ const routes: Routes = [
         component: InventoryEquipmentComponent,
         children: [
           {path: '', component: InventoryDetailComponent},
-          {path: 'edit', component: InventoryEditComponent}
+          {
+            path: 'edit', component: InventoryEditComponent, canActivate: [AuthGuard]
+          }
         ],
       }
     ],

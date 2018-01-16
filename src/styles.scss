@@ -22,3 +22,8 @@ $fa-font-path: '../node_modules/font-awesome/fonts';
   }
 }
 
+html, body, #fullheight {
+  min-height: 100% !important;
+  height: 100%;
+}
+

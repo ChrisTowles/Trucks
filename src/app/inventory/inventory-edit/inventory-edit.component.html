@@ -1,17 +1,18 @@
-<div class="container">
+<div class="container" *ngIf="item$ | async as item">
   <div class="row">
     <div class="col">
       <ol class="breadcrumb mt-2">
         <li class="breadcrumb-item"><a [routerLink]="['/inventory']">Inventory</a></li>
-        <li class="breadcrumb-item"><a [routerLink]="['/inventory', id ]">{{ (item | async)?.name }}</a>
+        <li class="breadcrumb-item"><a [routerLink]="['/inventory', id ]">{{ item.year ? item.year + ' ' : '' }}{{
+          item.name }}</a>
         </li>
         <li class="breadcrumb-item active">Edit</li>
       </ol>
     </div>
   </div>
-  <h1 class="modal-title">Editing <span class="text-info">{{ (item | async)?.name }}</span></h1>
+  <h1 class="modal-title">Editing <span class="text-info">{{ item.name }}</span></h1>
 
-  <ngb-tabset type="pills">
+  <ngb-tabset>
     <ngb-tab title="Properties">
       <ng-template ngbTabContent>
         <div class="row mt-3">
@@ -43,6 +44,7 @@
                     <label>Engine HP</label>
                     <input class="form-control" formControlName="engineHP">
                   </div>
+
                   <div class="form-group">
                     <label>Transmission</label>
                     <input class="form-control" formControlName="transmission">
@@ -57,6 +59,19 @@
                   </div>
                 </div>
                 <div class="col-12 col-md-6">
+                  <div class="form-group">
+                    <label>Price</label>
+                    <div class="input-group">
+                      <span class="input-group-addon">$</span>
+                      <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)"
+                             formControlName="price">
+                      <span class="input-group-addon">.00</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Year</label>
+                    <input class="form-control" formControlName="year">
+                  </div>
                   <div class="form-group">
                     <label>Stock #</label>
                     <input class="form-control" formControlName="stockNumber">
@@ -78,10 +93,6 @@
                     <input class="form-control" formControlName="odometer">
                   </div>
                   <div class="form-group">
-                    <label>Price</label>
-                    <input class="form-control" formControlName="gvwr">
-                  </div>
-                  <div class="form-group">
                     <label>Comments</label>
                     <textarea class="form-control" formControlName="comments"></textarea>
                   </div>
@@ -90,29 +101,42 @@
             </form>
           </div>
         </div>
-        <div class="row">
-          <div class="col">
-            <button type="button" class="btn btn-primary btn-block" (click)="save()">Save</button>
-          </div>
-        </div>
+
       </ng-template>
     </ngb-tab>
     <ngb-tab title="Images">
       <ng-template ngbTabContent>
         <div class="row mt-3">
-          <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3" *ngFor="let img of images; let i = index ">
-            <div class="card border-secondary" [ngClass]="{'border-primary': i === 0, 'border-secondary': i !== 0 }">
+          <div class="col-6 col-sm-4 col-md-3 mb-3"
+               *ngFor="let img of images$ | async as images; let i = index ">
+            <div class="card"
+                 [ngClass]="{
+                 'border-primary': item.img_public_id === img.public_id,
+                 'border-secondary':  item.img_public_id !== img.public_id
+                 }">
               <cl-image public-id="{{img.public_id}}" class="card-img-top">
                 <cl-transformation width="350" fetch_format="auto" crop="scale">
                 </cl-transformation>
               </cl-image>
-              <div class="card-body">
-                <p>{{ img.id }}</p>
+              <div class="card-body py-1">
+                {{ img.id }}
               </div>
               <div class="card-footer">
-                <button type="button" class="btn btn-danger" (click)="deleteImage(img)">
-                  Delete
-                </button>
+                <div class="btn-group d-flex" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-outline-primary w-100"
+                          [disabled]="i === 0"
+                          (click)="moveImageUp(img, images[i - 1], item.img_public_id)">
+                    <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger w-100" (click)="deleteImage(img, i)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary w-100"
+                          [disabled]="i === images.length - 1"
+                          (click)="moveImageDown(img, images[i + 1], item.img_public_id)">
+                    <i class="fa fa-chevron-right " aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -124,7 +148,6 @@
             <input type="file" class="form-control-file" ng2FileSelect [uploader]="uploader" multiple/><br/>
           </div>
         </div>
-
 
         <h3>Upload queue
           <span class="text-info" *ngIf="uploader?.queue?.length > 0">(Length: {{ uploader?.queue?.length }})</span>
@@ -197,10 +220,13 @@
             </button>
           </div>
         </div>
-
       </ng-template>
     </ngb-tab>
   </ngb-tabset>
-
+  <div class="row pt-3">
+    <div class="col">
+      <button type="button" class="btn btn-primary btn-block" (click)="save()">Save</button>
+    </div>
+  </div>
 </div>
 

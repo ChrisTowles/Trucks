@@ -21,38 +21,25 @@
 </div>
 
 <section class="container">
+
   <div class="row">
-    <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3"
-         *ngFor="let item of inventory | async; let i = index ">
-      <div class="card border-primary h-100">
-        <a [routerLink]="['inventory', item.id]">
-          <img class="card-img-top" src="{{ 'http://lorempixel.com/400/200/transport/' + i }}"
-               alt="Card image cap">
-        </a>
-        <div class="card-body">
-          <h4 class="card-title">{{ item.name }}</h4>
-          <div class="row">
-            <div class="col-6">Engine</div>
-            <div class="col-6">{{item.engineMake}}</div>
-          </div>
-          <div class="row">
-            <div class="col-6">Trans</div>
-            <div class="col-6">{{item.transmission}}</div>
-          </div>
-          <div class="row">
-            <div class="col-6">Susp</div>
-            <div class="col-6">{{item.suspension}}</div>
-          </div>
-          <div class="row">
-            <div class="col-6">Miles</div>
-            <div class="col-6">{{item.odometer}}</div>
-          </div>
-          <div class="row">
-            <div class="col-6">Price</div>
-            <div class="col-6">{{item.price}}</div>
-          </div>
-        </div>
-      </div>
+    <div class="col-md-4">
+      <h2>Inventory</h2>
+      <p>We are always bring in new equipment, take a look and let us know what you are looking for. </p>
+      <p><a class="btn btn-secondary" [routerLink]="['/inventory']" role="button">Inventory »</a></p>
+    </div>
+    <div class="col-md-4">
+      <h2>Family Owned</h2>
+      <p>We are family owned business and has been selling trucks to customers nationwide since opening for business in
+        1999. We pride ourselves in dealing with our customers using the honesty and integrity that every customer
+        deserves.</p>
+      <p><a class="btn btn-secondary" [routerLink]="['/about']" role="button">About Us »</a></p>
+    </div>
+    <div class="col-md-4">
+      <h2>Location</h2>
+      <p>We’re approximately 50 minutes north of Louisville and about 45 minutes south of Cincinnati. We are just
+        outside Owenton, Kentucky.</p>
+      <p><a class="btn btn-secondary" [routerLink]="['/directions']" role="button">Directions »</a></p>
     </div>
   </div>
 </section>

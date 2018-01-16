@@ -10,12 +10,75 @@
     flat bed or anything else that you might be currently looking for. Please feel free to call us at 502-463-2233, or
     send us information about your truck needs.
   </p>
-  <p class="text-center">
-    Craigmyle Truck & Trailer Sales, Inc.<br/>
+  <address class="text-center">
+    <strong>Craigmyle Truck & Trailer Sales, Inc.</strong><br/>
     #35 Highway 35<br/>
     Sparta, Kentucky 41086<br/>
     502-463-2233<br/>
-  </p>
+  </address>
 
-  // TODDO: add form
+  <form class="mb-3" [formGroup]="contactForm" novalidate (ngSubmit)="contactSubmit(contactForm.value)">
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group">
+          <label>First Name</label>
+          <input class="form-control" type="text" placeholder="John" formControlName="firstName">
+          <div class="form-text text-danger" *ngIf="contactForm.controls['firstName'].touched">
+            <div *ngIf="contactForm.controls['firstName'].hasError('required')">
+              You must include a first name.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group">
+          <label>Last Name</label>
+          <input class="form-control" type="text" placeholder="Doe" formControlName="lastName">
+          <div class="form-text text-danger" *ngIf="contactForm.controls['lastName'].touched">
+            <div *ngIf="contactForm.controls['lastName'].hasError('required')">
+              You must include a last name.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" class="form-control" formControlName="email">
+      <div class="form-text text-danger" *ngIf="contactForm.controls['email'].touched">
+        <div *ngIf="contactForm.controls['email'].hasError('required')">
+          You must include your email.
+        </div>
+        <div *ngIf="contactForm.controls['email'].hasError('email')">
+          You must provide a valid email address.
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Subject</label>
+      <input type="text" class="form-control" formControlName="subject">
+      <div class="form-text text-danger" *ngIf="contactForm.controls['subject'].touched">
+        <div *ngIf="contactForm.controls['subject'].hasError('required')">
+          A subject is required.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Message</label>
+      <textarea class="form-control" formControlName="message"></textarea>
+      <div class="form-text text-danger" *ngIf="contactForm.controls['message'].touched">
+        <div *ngIf="contactForm.controls['message'].hasError('required')">
+          A message is required.
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block" [disabled]="contactForm.invalid">Submit</button>
+  </form>
+
+  <!--<ngb-alert *ngIf="successMessage" type="success" (close)="successMessage = null"><strong>Thanks!</strong> {{-->
+  <!--successMessage }}-->
+  <!--</ngb-alert>-->
+
 </div>

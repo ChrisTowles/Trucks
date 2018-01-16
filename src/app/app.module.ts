@@ -13,11 +13,6 @@ import {ProgressInterceptor} from './shared/interceptors/progress.interceptor';
 import {TimingInterceptor} from './shared/interceptors/timing.interceptor';
 
 import {environment} from '../environments/environment';
-import {AngularFireModule} from 'angularfire2';
-import {AngularFirestoreModule} from 'angularfire2/firestore';
-import {AngularFireAuthModule} from 'angularfire2/auth';
-import {AngularFireDatabaseModule} from 'angularfire2/database';
-import {AngularFireStorageModule} from 'angularfire2/storage';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {AuthService} from './core/auth.service';
@@ -37,25 +32,32 @@ import {NgxGalleryModule} from 'ngx-gallery';
 import {CloudinaryConfiguration, CloudinaryModule} from '@cloudinary/angular-5.x';
 import {Cloudinary} from 'cloudinary-core';
 import {FileUploadModule} from 'ng2-file-upload';
+import {AdminComponent} from './admin/admin.component';
+import {LocalStorageModule} from 'angular-2-local-storage';
+import {AngularFireModule} from 'angularfire2';
+import {AngularFirestoreModule} from 'angularfire2/firestore';
+import {AngularFireAuthModule} from 'angularfire2/auth';
 
 @NgModule({
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({appId: 'app-root'}),
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFireDatabaseModule,
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features
-    AngularFireStorageModule,
     NgbModule.forRoot(),
     CoreModule,
     NgxGalleryModule,
     CloudinaryModule.forRoot({Cloudinary}, environment.cloudinary as CloudinaryConfiguration),
-    FileUploadModule
+    FileUploadModule,
+    LocalStorageModule.withConfig({
+      prefix: 'craigmyle-trucks',
+      storageType: 'localStorage'
+    })
   ],
   declarations: [
     AppComponent,
@@ -68,7 +70,8 @@ import {FileUploadModule} from 'ng2-file-upload';
     InventoryEditComponent,
     InventoryEquipmentComponent,
     InventoryDeleteComponent,
-    DirectionsComponent
+    DirectionsComponent,
+    AdminComponent
   ],
   providers: [
     AuthService,

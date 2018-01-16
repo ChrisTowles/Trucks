@@ -9,6 +9,7 @@ export const environment = {
     messagingSenderId: '988778688785'
   },
   cloudinary: {
-    cloud_name: 'slyedoc'
+    cloud_name: 'slyedoc',
+    upload_preset: 'equipment'
   }
 };

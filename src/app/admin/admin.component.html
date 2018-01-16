@@ -1,0 +1,59 @@
+<div class="jumbotron">
+  <div class="container">
+    <h1>Admin</h1>
+  </div>
+</div>
+<div class="container">
+  <ngb-tabset>
+    <ngb-tab title="Messages">
+      <ng-template ngbTabContent>
+        <div class="row mt-3">
+          <div class="col">
+            <table class="table">
+              <thead>
+              <tr>
+                <th scope="col">Actions</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Subject</th>
+                <th scope="col">Message</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let msg of messages">
+                <td>
+                  <button type="button" class="btn btn-info" *ngIf="!msg.read" (click)="messageRead(msg)">Mark
+                    Read
+                  </button>
+                  <button type="button" class="btn btn-secondary" *ngIf="msg.read" (click)="messageUnread(msg)">Mark
+                    Unread
+                  </button>
+                  <button type="button" class="btn btn-danger" (click)="messageDelete(msg)">Delete</button>
+                </td>
+                <td>{{ msg.firstName }}</td>
+                <td>{{ msg.lastName }}</td>
+                <td><a
+                  [href]="'mailto:' + msg.email + '?subject=RE:' + encodeURI(msg.subject)">{{msg.email}}</a>
+                </td>
+                <td>{{ msg.subject }}</td>
+                <td>{{ msg.message }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab title="Users">
+      <ng-template ngbTabContent>
+        <div class="row mt-3">
+          <div class="col">
+            List of users
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+
+  </ngb-tabset>
+</div>

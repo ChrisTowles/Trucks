@@ -7,6 +7,7 @@ import {InventoryDeleteComponent} from '../inventory-delete/inventory-delete.com
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../core/auth.service';
+import {Meta, Title} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-inventory-list',
@@ -24,7 +25,9 @@ export class InventoryListComponent {
               private router: Router,
               private activatedRoute: ActivatedRoute,
               private fb: FormBuilder,
-              public authService: AuthService) {
+              public authService: AuthService,
+              private meta: Meta,
+              private title: Title) {
 
     this.createForm();
     this.activatedRoute.queryParams
@@ -40,7 +43,11 @@ export class InventoryListComponent {
         }).map(equip => equip.filter(a => {
           if (this.searchForm.value.searchText !== '') {
             return Object.keys(a).some(k => {
-              return a[k].toLowerCase().includes(this.searchForm.value.searchText.toLowerCase());
+              if (typeof a[k] === 'string') {
+                return a[k].toLowerCase().includes(this.searchForm.value.searchText.toLowerCase());
+              } else {
+                return false;
+              }
             });
           } else {
             return true;
@@ -48,6 +55,10 @@ export class InventoryListComponent {
         }));
       });
 
+    this.meta.addTags([
+      {name: 'description', content: 'Inventory Page for Craigmyle Trucks'}
+    ]);
+    this.title.setTitle('Craigmyle Trucks - Inventory');
   }
 
   createForm() {
@@ -58,7 +69,6 @@ export class InventoryListComponent {
 
   search() {
 
-    console.log('search', {search: this.searchForm.value.searchText !== '' ? this.searchForm.value.searchText : null});
     const urlTree = this.router.createUrlTree([], {
       queryParams: {search: this.searchForm.value.searchText !== '' ? this.searchForm.value.searchText : null},
       queryParamsHandling: 'merge',
