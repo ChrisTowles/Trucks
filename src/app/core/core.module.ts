@@ -4,16 +4,16 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 
 import {throwIfAlreadyLoaded} from './module-import-guard';
-import {LoggerService} from './logger.service';
 
 import {NavComponent} from './nav/nav.component';
 import {FooterComponent} from './footer/footer.component';
 import {RouterModule} from '@angular/router';
 import {Error404Component} from './error404/error-404.component';
-import {ProgressBarService} from './progress-bar.service';
 import {AuthService} from './auth.service';
-import {NgbCollapseModule} from '@ng-bootstrap/ng-bootstrap';
-import {AuthGuard} from './auth.guard';
+import {NgbCollapseModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {AdminGuard} from './admin.guard';
+import {InventoryService} from './inventory.service';
+import {HttpClientModule} from '@angular/common/http';
 
 
 @NgModule({
@@ -22,11 +22,13 @@ import {AuthGuard} from './auth.guard';
     FormsModule,
     RouterModule,
     ReactiveFormsModule,
-    NgbCollapseModule
+    NgbDropdownModule,
+    NgbCollapseModule,
+    HttpClientModule,
   ],
   exports: [
     NavComponent,
-    FooterComponent
+    FooterComponent,
   ],
   declarations: [
     NavComponent,
@@ -34,10 +36,9 @@ import {AuthGuard} from './auth.guard';
     Error404Component
   ],
   providers: [
-    LoggerService,
-    ProgressBarService,
     AuthService,
-    AuthGuard
+    AdminGuard,
+    InventoryService
   ]
 })
 

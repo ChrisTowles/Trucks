@@ -7,36 +7,36 @@ import {CoreModule} from './core/core.module';
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {ProgressBarService} from './core/progress-bar.service';
-import {ProgressInterceptor} from './shared/interceptors/progress.interceptor';
-import {TimingInterceptor} from './shared/interceptors/timing.interceptor';
 
 import {environment} from '../environments/environment';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {AuthService} from './core/auth.service';
 
-import {HomeComponent} from './home/home.component';
-import {AboutComponent} from './about/about.component';
-import {ContactComponent} from './contact/contact.component';
-import {DirectionsComponent} from './directions/directions.component';
+import {HomeComponent} from './pages/home/home.component';
+import {AboutComponent} from './pages/about/about.component';
+import {ContactComponent} from './pages/contact/contact.component';
+import {DirectionsComponent} from './pages/directions/directions.component';
 
-import {InventoryComponent} from './inventory/inventory.component';
-import {InventoryListComponent} from './inventory/inventory-list/inventory-list.component';
-import {InventoryDetailComponent} from './inventory/inventory-detail/inventory-detail.component';
-import {InventoryEditComponent} from './inventory/inventory-edit/inventory-edit.component';
-import {InventoryEquipmentComponent} from './inventory/inventory-equipment.component';
-import {InventoryDeleteComponent} from './inventory/inventory-delete/inventory-delete.component';
+import {InventoryComponent} from './pages/inventory/inventory.component';
+import {InventoryListComponent} from './pages/inventory/inventory-list/inventory-list.component';
+import {InventoryDetailComponent} from './pages/inventory/inventory-detail/inventory-detail.component';
+import {InventoryEditComponent} from './pages/inventory/inventory-edit/inventory-edit.component';
+import {InventoryEquipmentComponent} from './pages/inventory/inventory-equipment.component';
+import {InventoryDeleteComponent} from './pages/inventory/inventory-delete/inventory-delete.component';
 import {NgxGalleryModule} from 'ngx-gallery';
 import {CloudinaryConfiguration, CloudinaryModule} from '@cloudinary/angular-5.x';
 import {Cloudinary} from 'cloudinary-core';
 import {FileUploadModule} from 'ng2-file-upload';
-import {AdminComponent} from './admin/admin.component';
+import {AdminComponent} from './pages/admin/admin.component';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {AngularFireModule} from 'angularfire2';
 import {AngularFirestoreModule} from 'angularfire2/firestore';
 import {AngularFireAuthModule} from 'angularfire2/auth';
+import {ToastrModule} from 'ngx-toastr';
+import { EquipmentOptionsComponent } from './pages/admin/equipment-options/equipment-options.component';
+import { UsersComponent } from './pages/admin/users/users.component';
+import { MessagesComponent } from './pages/admin/messages/messages.component';
 
 @NgModule({
   imports: [
@@ -44,7 +44,6 @@ import {AngularFireAuthModule} from 'angularfire2/auth';
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
@@ -53,6 +52,7 @@ import {AngularFireAuthModule} from 'angularfire2/auth';
     CoreModule,
     NgxGalleryModule,
     CloudinaryModule.forRoot({Cloudinary}, environment.cloudinary as CloudinaryConfiguration),
+    ToastrModule.forRoot(),
     FileUploadModule,
     LocalStorageModule.withConfig({
       prefix: 'craigmyle-trucks',
@@ -71,12 +71,13 @@ import {AngularFireAuthModule} from 'angularfire2/auth';
     InventoryEquipmentComponent,
     InventoryDeleteComponent,
     DirectionsComponent,
-    AdminComponent
+    AdminComponent,
+    EquipmentOptionsComponent,
+    UsersComponent,
+    MessagesComponent
   ],
   providers: [
     AuthService,
-    {provide: HTTP_INTERCEPTORS, useClass: ProgressInterceptor, multi: true, deps: [ProgressBarService]},
-    {provide: HTTP_INTERCEPTORS, useClass: TimingInterceptor, multi: true}
   ],
   entryComponents: [InventoryDeleteComponent],
   bootstrap: [AppComponent]

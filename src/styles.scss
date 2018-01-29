@@ -2,6 +2,7 @@
 @import "~bootswatch/dist/flatly/variables";
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/flatly/bootswatch";
+@import "~ngx-toastr/toastr-bs4-alert";
 
 $fa-font-path: '../node_modules/font-awesome/fonts';
 @import "~font-awesome/scss/font-awesome.scss";
@@ -22,8 +23,7 @@ $fa-font-path: '../node_modules/font-awesome/fonts';
   }
 }
 
-html, body, #fullheight {
-  min-height: 100% !important;
-  height: 100%;
+body {
+  padding-top: 70px;
 }
 

@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../auth.service';
-import {Message, MessageId} from '../message.model';
+import {Message, MessageId} from '../../shared/model/message.model';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
 
 @Component({
@@ -57,7 +57,6 @@ export class NavComponent {
     this.authService.signInWithGoogle()
       .then((res) => {
         this.router.navigate(['']);
-      })
-      .catch((err) => console.log(err));
+      });
   }
 }

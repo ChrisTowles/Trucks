@@ -4,87 +4,95 @@ import {Router} from '@angular/router';
 import {AngularFireAuth} from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import {Observable} from 'rxjs/Observable';
-import {User} from './user';
-import {AngularFirestore} from 'angularfire2/firestore';
+import {AngularFirestore, AngularFirestoreDocument} from 'angularfire2/firestore';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/take';
-import * as _ from 'lodash';
+
+export interface UserBasic {
+  id: string;
+  email: string;
+  photoURL?: string;
+  displayName?: string;
+}
+
+export interface User extends UserBasic {
+  admin: boolean;
+}
 
 @Injectable()
 export class AuthService {
-  user: Observable<User> = null;
-  userRoles: Array<string>;
+  user: Observable<User>;
+
 
   constructor(private afs: AngularFirestore,
-              private firebaseAuth: AngularFireAuth,
+              private afAuth: AngularFireAuth,
               private router: Router) {
 
     // Listen for authState changes
-    this.firebaseAuth.authState
-      .switchMap(auth => {
-        if (auth) {
-          /// signed in
-          return this.updateUser(auth)
-            .do(x => {
-              this.userRoles = _.keys(_.pickBy(x.roles));
-            });
+    this.user = this.afAuth.authState
+      .switchMap(user => {
+        if (user) {
+          return this.afs.doc<User>(`users/${user.uid}`).valueChanges();
         } else {
           /// not signed in
           return Observable.of(null);
         }
-      })
-      .do(user => {
-
-      })
-      .subscribe(user => {
-        this.user = user;
       });
   }
 
   signInWithGoogle() {
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     googleProvider.addScope('email');
+    return this.oAuthLogin(googleProvider);
 
-    return this.firebaseAuth.auth.signInWithRedirect(googleProvider)
+  }
+
+  private oAuthLogin(provider) {
+    return this.afAuth.auth.signInWithRedirect(provider)
       .then(cred => {
-        this.updateUser(cred);
+        this.updateUserData(cred);
       });
   }
 
+
   logout() {
-    this.firebaseAuth.auth.signOut()
+    this.afAuth.auth.signOut()
       .then((res) => this.router.navigate(['/']));
   }
 
-  /// updates database with user info after login
-  /// only runs if user role is not already defined in database
-  private updateUser(authData): Observable<User> {
-    const userData = new User(authData);
-    const userDoc = this.afs.doc<User>('users/' + authData.uid);
+  private updateUserData(user) {
+    // Sets user data to firestore on login
+    const userRef: AngularFirestoreDocument<any> = this.afs.doc(`users/${user.id}`);
 
-    return userDoc.snapshotChanges()
+    const data: UserBasic = {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL
+    };
+
+    return userRef.snapshotChanges()
       .take(1)
       .map(doc => {
-        if (!doc.payload.exists) {
-          userDoc.set({...userData});
-          return userData;
+        if (doc.payload.exists) {
+          const oldData = doc.payload.data() as User;
+          const roleData = {admin: oldData.admin};
+          return userRef.set({...data, ...roleData});
         } else {
-          return doc.payload.data() as User;
+          return userRef.set({...data});
         }
       });
   }
 
-  isLoggedIn() {
-    return this.user !== null;
-  }
-
-  isAdmin(): boolean {
-    const allowed = ['admin'];
-    return this.isLoggedIn() && this.matchingRole(allowed);
-  }
-
-  // Determine if any matching roles exist
-  private matchingRole(allowedRoles): boolean {
-    return !_.isEmpty(_.intersection(allowedRoles, this.userRoles));
+  isAdmin(): Observable<boolean> {
+    return this.user
+      .take(1)
+      .map(user => {
+        if (user) {
+          return user.admin;
+        }
+        return false;
+      });
   }
 }
+

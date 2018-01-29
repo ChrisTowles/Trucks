@@ -1,0 +1,434 @@
+<div class="container" *ngIf="item">
+  <div class="row">
+    <div class="col">
+      <ol class="breadcrumb mt-2">
+        <li class="breadcrumb-item"><a [routerLink]="['/inventory']">Inventory</a></li>
+        <li class="breadcrumb-item"><a [routerLink]="['/inventory', id ]">{{ item.name }}</a>
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+      </ol>
+    </div>
+  </div>
+  <h1>Editing <span class="text-info">{{ item.name }}</span></h1>
+
+  <ngb-tabset>
+    <ngb-tab title="Properties">
+      <ng-template ngbTabContent>
+        <form class="row pt-3" [formGroup]="itemForm" novalidate>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Name</span>
+              </div>
+              <input class="form-control" formControlName="name">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" (click)="buildName()">Build</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Stock #</span>
+              </div>
+              <input class="form-control" formControlName="stockNumber">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Category</span>
+              </div>
+              <select class="form-control" formControlName="category">
+                <option *ngFor="let o of inventoryService.categories" [ngValue]="o">{{ o }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Vin</span>
+              </div>
+              <input type="text" class="form-control" formControlName="vin">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" (click)="processVin()">Process</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Status</span>
+              </div>
+              <select class="form-control" formControlName="status">
+                <option [ngValue]="0">Hidden</option>
+                <option [ngValue]="1">Visible</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Price</span>
+                <span class="input-group-text">$</span>
+              </div>
+              <input type="text" class="form-control" formControlName="price" pattern="[0-9]*">
+              <div class="input-group-append">
+                <span class="input-group-text">.00</span>
+              </div>
+            </div>
+            <div class="form-text text-danger">
+              <div *ngIf="itemForm.controls['price'].hasError('pattern')">
+                Must be digits!
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Year</span>
+              </div>
+              <select class="form-control" formControlName="year">
+                <option *ngFor="let year of formOptions.years" [ngValue]="year">{{year}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Make</span>
+              </div>
+              <input class="form-control" type="text" formControlName="make">
+            </div>
+          </div>
+
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Model</span>
+              </div>
+              <input class="form-control" formControlName="model">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Series</span>
+              </div>
+              <input class="form-control" formControlName="series">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Engine Man.</span>
+              </div>
+              <input class="form-control" formControlName="engineManufacturer">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Engine Model</span>
+              </div>
+              <input class="form-control" formControlName="engineModel">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Engine Liters</span>
+              </div>
+              <input class="form-control" formControlName="engineLiters" pattern="[0-9\.]*">
+              <div class="input-group-append">
+                <span class="input-group-text">liters</span>
+              </div>
+            </div>
+            <div class="form-text text-danger">
+              <div *ngIf="itemForm.controls['engineLiters'].hasError('pattern')">
+                Must be digits!
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Engine HP</span>
+              </div>
+              <input class="form-control" formControlName="engineHP">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Engine Cylinders</span>
+              </div>
+              <input class="form-control" formControlName="engineCylinders">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Fuel Type</span>
+              </div>
+              <select class="form-control" formControlName="fuelType">
+                <option>Diesel</option>
+                <option>Gasoline</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Brake Type</span>
+              </div>
+              <select class="form-control" formControlName="brakeType">
+                <option [ngValue]="'Hydraulic'">Hydraulic</option>
+                <option [ngValue]="'Air'">Air</option>
+                <option [ngValue]="'Electric'">Electric</option>
+                <option [ngValue]="'Other'">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Transmission</span>
+              </div>
+              <input class="form-control" formControlName="transmission">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Drive Type</span>
+              </div>
+              <input class="form-control" formControlName="driveType">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Suspension</span>
+              </div>
+              <select class="form-control" formControlName="suspension">
+                <option>Air</option>
+                <option>Beam</option>
+                <option>Other</option>
+                <option>Spring</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Rear End Ratio</span>
+              </div>
+              <input class="form-control" formControlName="rearEndRatio">
+            </div>
+          </div>
+
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">GVWR</span>
+              </div>
+              <input class="form-control" formControlName="gvwr">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">GVWR Class</span>
+              </div>
+              <input class="form-control" formControlName="gvwrClass">
+            </div>
+          </div>
+
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Bed Dimensions</span>
+              </div>
+              <input class="form-control" formControlName="bedDimensions">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Wheel Base</span>
+              </div>
+              <input class="form-control" formControlName="wheelBase">
+            </div>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Mileage</span>
+              </div>
+              <input class="form-control" formControlName="odometer" pattern="[0-9]*">
+              <div class="input-group-append">
+                <span class="input-group-text">mi</span>
+              </div>
+            </div>
+            <div class="form-text text-danger">
+              <div *ngIf="itemForm.controls['odometer'].hasError('pattern')">
+                Must be digits!
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-12">
+            <label>Comments</label>
+            <textarea class="form-control" rows="3" formControlName="comments"></textarea>
+          </div>
+
+
+        </form>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-primary btn-block"
+                    [disabled]="itemForm.invalid"
+                    (click)="save()">Save
+            </button>
+          </div>
+          <div class="col">
+            <button class="btn btn-danger btn-block" (click)="itemForm.reset()"> Clear</button>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab title="Images">
+      <ng-template ngbTabContent>
+        <div class="row mt-3">
+          <div class="col-6 col-sm-4 col-md-3 mb-3"
+               *ngFor="let img of images$ | async as images; let i = index ">
+            <div class="card"
+                 [ngClass]="{
+                 'border-primary': item.img_public_id === img.public_id,
+                 'border-secondary':  item.img_public_id !== img.public_id
+                 }">
+              <cl-image public-id="{{img.public_id}}" class="card-img-top">
+                <cl-transformation width="350" fetch_format="auto" crop="scale">
+                </cl-transformation>
+              </cl-image>
+              <div class="card-body py-1">
+                {{ img.id }}
+              </div>
+              <div class="card-footer">
+                <div class="btn-group d-flex" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-outline-primary w-100"
+                          [disabled]="i === 0"
+                          (click)="moveImageUp(img, images[i - 1], item.img_public_id)">
+                    <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-danger w-100" (click)="deleteImage(img, i)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-outline-primary w-100"
+                          [disabled]="i === images.length - 1"
+                          (click)="moveImageDown(img, images[i + 1], item.img_public_id)">
+                    <i class="fa fa-chevron-right " aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Upload Images</h3>
+        <div class="row">
+          <div class="col">
+            <input type="file" class="form-control-file" ng2FileSelect [uploader]="uploader" multiple/><br/>
+          </div>
+        </div>
+
+        <h3>Upload queue
+          <span class="text-info" *ngIf="uploader?.queue?.length > 0">(Length: {{ uploader?.queue?.length }})</span>
+        </h3>
+
+        <table class="table">
+          <thead>
+          <tr>
+            <th width="50%">Name</th>
+            <th>Size</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let item of uploader.queue">
+            <td><strong>{{ item?.file?.name }}</strong></td>
+            <td *ngIf="uploader.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
+            <td *ngIf="uploader.isHTML5">
+              <div class="progress" style="margin-bottom: 0;">
+                <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }"></div>
+              </div>
+            </td>
+            <td class="text-center">
+              <span *ngIf="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+              <span *ngIf="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+              <span *ngIf="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+            </td>
+            <td nowrap>
+              <button type="button" class="btn btn-success btn-sm"
+                      (click)="item.upload()" [disabled]="item.isReady || item.isUploading || item.isSuccess">
+                <span class="glyphicon glyphicon-upload"></span> Upload
+              </button>
+              <button type="button" class="btn btn-warning btn-sm"
+                      (click)="item.cancel()" [disabled]="!item.isUploading">
+                <span class="glyphicon glyphicon-ban-circle"></span> Cancel
+              </button>
+              <button type="button" class="btn btn-danger btn-sm"
+                      (click)="item.remove()">
+                <span class="glyphicon glyphicon-trash"></span> Remove
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="uploader?.queue?.length == 0">
+            <td colspan="5">
+              <p class="text-muted">Nothing in queue!</p>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <h5>Queue progress</h5>
+
+        <ngb-progressbar type="success" [value]="uploader.progress"></ngb-progressbar>
+
+
+        <div class="row">
+          <div class="col mt-2">
+            <!--<button type="button" class="btn btn-success btn-sm"-->
+            <!--(click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">-->
+            <!--<span class="glyphicon glyphicon-upload"></span> Upload all-->
+            <!--</button>-->
+            <button type="button" class="btn btn-warning btn-sm"
+                    (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
+              <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+            </button>
+            <button type="button" class="btn btn-danger btn-sm"
+                    (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
+              <span class="glyphicon glyphicon-trash"></span> Remove all
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab title="Options">
+      <ng-template ngbTabContent>
+        <div class="row pt-3 pl-3">
+          <div class="form-check col-12 col-sm-6 col-md-4 col-lg-3 py-1" *ngFor="let o of formOptions.options">
+            <label class="form-check-label">
+              <input class="form-check-input" type="checkbox" [(ngModel)]="o.value" (ngModelChange)="saveOption(o)">
+              {{o.name}}
+            </label>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+  <div class="row pt-3">
+  </div>
+</div>
+
