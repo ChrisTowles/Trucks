@@ -19,11 +19,18 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.scss"
+        "styles.scss",
+        "styles-app-loading.scss"
       ],
       "scripts": [
         "assets/js/modernizr.js"
       ],
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "./",
+          "./themes"
+        ]
+      },
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",

@@ -14,11 +14,11 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(eot|otf|ttf|ttc|woff|css|js|css)",
+        "source": "**/*.@(eot|otf|ttf|ttc|woff|css|js|css|svg)",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "max-age=7200"
+            "value": "max-age=604800"
           }
         ]
       }
@@ -30,5 +30,10 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "functions": {
+    "predeploy": [
+      "npm --prefix $RESOURCE_DIR run lint"
+    ]
   }
 }

@@ -5,13 +5,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --aot --prod --souremaps --vendor-chunk=false -env=prod ",
+    "build": "ng build --target=production --build-optimizer --extract-css=true",
     "build:universal": "ng build --prod && ng build --prod --app 1 --output-hashing=false && del functions\\dist /S /Q && xcopy .\\dist .\\functions\\dist /E",
     "build:firebase": "npm run build:universal && del functions\\dist /S /Q && xcopy .\\dist .\\functions\\dist /E && del dist\\index.html",
     "serve": "ng build",
     "serve:universal": "npm run build:universal && ts-node server",
     "serve:firebase": "npm run build:firebase && npm --prefix functions run build && firebase serve --only functions,hosting",
-    "test": "ng test",
+    "test": "ng test --browser ChromeHeadless --single-run",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "compile_@ng-bootstrap": "babel node_modules/@ng-bootstrap/ng-bootstrap -d node_modules/@ng-bootstrap/ng-bootstrap --presets es2015"
