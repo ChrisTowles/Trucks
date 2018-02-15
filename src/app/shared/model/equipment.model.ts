@@ -15,7 +15,9 @@ export interface Equipment {
   engineCylinders: number;
   engineLiters: number;
   transmission: string;
+  transmissionManufacturer: string;
   driveType: string;
+  numberRearAxles: number;
   suspension: string;
   rearEndRatio: string;
   brakeType: string;
@@ -26,6 +28,8 @@ export interface Equipment {
   odometer: number;
   price: number;
   comments: string;
+  frontTireSize: string;
+  rearTireSize: string;
   img_public_id: string;
 
 

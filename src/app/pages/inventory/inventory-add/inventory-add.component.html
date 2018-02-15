@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h4 class="modal-title">Add New Equipment</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form class="" [formGroup]="addForm" novalidate>
+    <div class="form-group ">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            Stock Number
+          </div>
+        </div>
+        <input class="form-control" formControlName="stockNumber" (keyup.enter)="add()"
+               #stockNumber>
+      </div>
+      <div class="form-text text-danger">
+        <div *ngIf="addForm.controls['stockNumber'].hasError('required')">
+          Required
+        </div>
+        <div *ngIf="addForm.controls['stockNumber'].hasError('pattern')">
+          Must be digits!
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Cancel</button>
+  <button type="button" class="btn btn-primary" [disabled]="addForm.invalid" (click)="add()">Add</button>
+</div>

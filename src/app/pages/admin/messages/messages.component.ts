@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
+import {Message, MessageId} from '@app/shared';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {Message, MessageId} from '../../../shared/model/message.model';
 
 @Component({
   selector: 'app-messages',

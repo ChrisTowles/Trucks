@@ -1,9 +1,9 @@
 import {Component} from '@angular/core';
-import {Router} from '@angular/router';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {AuthService} from '../auth.service';
-import {Message, MessageId} from '../../shared/model/message.model';
+import {Router} from '@angular/router';
+import {Message, MessageId} from '@app/shared';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
+import {AuthService} from './../auth.service';
 
 @Component({
   selector: 'app-nav',

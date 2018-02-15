@@ -10,5 +10,32 @@
   //     ]
   //   }
   // ]
-  "indexes": []
+  "indexes": [
+    {
+      "collectionId": "inventory",
+      "fields": [
+        {
+          "fieldPath": "category",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "stockNumber",
+          "mode": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "inventory",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "stockNumber",
+          "mode": "DESCENDING"
+        }
+      ]
+    }
+  ]
 }

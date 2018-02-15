@@ -41,6 +41,7 @@
             Admin
           </a>
           <div ngbDropdownMenu>
+            <a class="dropdown-item" [routerLink]="['/admin/vin-tool']" (click)="navbarCollapsed = true">Vin Tool</a>
             <a class="dropdown-item" [routerLink]="['/admin/users']" (click)="navbarCollapsed = true">Users</a>
             <a class="dropdown-item" [routerLink]="['/admin/messages']" (click)="navbarCollapsed = true">Messages</a>
             <a class="dropdown-item" [routerLink]="['/admin/equipment-options']" (click)="navbarCollapsed = true">Equipment

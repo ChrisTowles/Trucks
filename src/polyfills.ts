@@ -50,10 +50,14 @@ import 'web-animations-js'; // Run `npm install --save web-animations-js`.
  */
 import 'zone.js/dist/zone'; // Included with Angular CLI.
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/merge';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
 /**
  * Need to import hammer for Angular Material support.
  */

@@ -1,20 +1,19 @@
-import {NgModule, Optional, SkipSelf} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {HttpClientModule} from '@angular/common/http';
+import {NgModule, Optional, SkipSelf} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RouterModule} from '@angular/router';
+import {NgbCollapseModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+import {AdminGuard} from './admin.guard';
+import {AuthService} from './auth.service';
+import {Error404Component} from './error404/error-404.component';
+import {FooterComponent} from './footer/footer.component';
+import {InventoryService} from './inventory.service';
 
 
 import {throwIfAlreadyLoaded} from './module-import-guard';
 
 import {NavComponent} from './nav/nav.component';
-import {FooterComponent} from './footer/footer.component';
-import {RouterModule} from '@angular/router';
-import {Error404Component} from './error404/error-404.component';
-import {AuthService} from './auth.service';
-import {NgbCollapseModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
-import {AdminGuard} from './admin.guard';
-import {InventoryService} from './inventory.service';
-import {HttpClientModule} from '@angular/common/http';
-
 
 @NgModule({
   imports: [

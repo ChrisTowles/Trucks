@@ -15,6 +15,7 @@ import {AdminGuard} from './core/admin.guard';
 import {MessagesComponent} from './pages/admin/messages/messages.component';
 import {UsersComponent} from './pages/admin/users/users.component';
 import {EquipmentOptionsComponent} from './pages/admin/equipment-options/equipment-options.component';
+import {VinToolComponent} from './pages/admin/vin-tool/vin-tool.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
@@ -30,6 +31,7 @@ const routes: Routes = [
       {path: 'messages', component: MessagesComponent},
       {path: 'users', component: UsersComponent},
       {path: 'equipment-options', component: EquipmentOptionsComponent},
+      {path: 'vin-tool', component: VinToolComponent},
     ]
   },
   {
@@ -38,7 +40,7 @@ const routes: Routes = [
     children: [
       {path: '', component: InventoryListComponent},
       {
-        path: ':id',
+        path: ':name',
         component: InventoryEquipmentComponent,
         children: [
           {path: '', component: InventoryDetailComponent},

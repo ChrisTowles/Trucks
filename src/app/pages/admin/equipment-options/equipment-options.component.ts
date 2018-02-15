@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
+import {InventoryService} from '@app/core';
+import {EquipmentOption, EquipmentOptionId} from '@app/shared';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {EquipmentOption, EquipmentOptionId} from '../../../shared/model/equipment-option.model';
-import {InventoryService} from '../../../core/inventory.service';
 import {ToastrService} from 'ngx-toastr';
 
 @Component({

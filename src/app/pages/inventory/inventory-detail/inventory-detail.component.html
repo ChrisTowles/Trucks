@@ -66,6 +66,10 @@
         <div class="col-6">Fuel Type</div>
         <div class="col-6">{{item.fuelType}}</div>
       </div>
+      <div class="row" *ngIf="item.transmissionManufacturer">
+        <div class="col-6">Transmission Manufacturer</div>
+        <div class="col-6">{{item.transmissionManufacturer}}</div>
+      </div>
       <div class="row" *ngIf="item.transmission">
         <div class="col-6">Transmission</div>
         <div class="col-6">{{item.transmission}}</div>
@@ -73,6 +77,19 @@
       <div class="row" *ngIf="item.driveType">
         <div class="col-6">Drive Type</div>
         <div class="col-6">{{item.driveType}}</div>
+      </div>
+      <div class="row" *ngIf="item.numberRearAxles">
+        <div class="col-6">Number Rear Axles</div>
+        <div class="col-6">{{item.numberRearAxles}}</div>
+      </div>
+
+      <div class="row" *ngIf="item.frontTireSize">
+        <div class="col-6">Front Tire Size</div>
+        <div class="col-6">{{item.frontTireSize}}</div>
+      </div>
+      <div class="row" *ngIf="item.rearTireSize">
+        <div class="col-6">Rear Tire Size</div>
+        <div class="col-6">{{item.rearTireSize}}</div>
       </div>
       <div class="row" *ngIf="item.suspension">
         <div class="col-6">Suspension</div>

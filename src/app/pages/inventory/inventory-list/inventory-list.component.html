@@ -28,13 +28,14 @@
     <div class="col">
       <div class="float-right">
         <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-primary" id="dropdownBasic1" ngbDropdownToggle>Category: {{ category }}
+          <button class="btn btn-secondary" id="dropdownBasic1" ngbDropdownToggle>
+            Category: {{ category.name }} ({{category.count}})
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item" (click)="setCategory('All')" [disabled]="category === 'All'">All</button>
-            <button class="dropdown-item" *ngFor="let o of inventoryService.categories" (click)="setCategory(o)"
-                    [disabled]="category === o">
-              {{ o }}
+            <button class="dropdown-item" *ngFor="let o of categories" (click)="setCategory(o)"
+                    [disabled]="category.name === o.name">
+              {{ o.name }}
+              <span class="pull-right">({{o.count}})</span>
             </button>
 
           </div>
@@ -46,14 +47,14 @@
       </div>
     </div>
   </div>
-  <div class="row" *ngIf="(inventory | async)?.length != 0">
-    <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3"
-         *ngFor="let item of inventory | async; let i = index ">
+  <div class="row" *ngIf="inventory.length != 0">
+    <div class="col-lg-4 col-md-6 col-12 mb-3"
+         *ngFor="let item of inventory; let i = index ">
       <div class="card h-100" [ngClass]="{
       'border-primary': item.status != 0,
       'border-danger': item.status == 0
       }">
-        <a [routerLink]="[item.id]">
+        <a [routerLink]="[inventoryService.getUrl(item)]">
           <ng-container *ngIf="item.img_public_id; else noImg">
             <cl-image public-id="{{item.img_public_id}}" class="card-img-top">
               <cl-transformation width="350" fetch_format="auto" crop="scale">
@@ -62,65 +63,43 @@
           </ng-container>
         </a>
         <div class="card-body">
-          <a [routerLink]="[item.id]">
+          <a [routerLink]="[inventoryService.getUrl(item)]">
             <h4 class="card-title text-center">{{ item.name }}</h4>
           </a>
-          <div class="row" *ngIf="item.year">
-            <div class="col">
-              Year
-              <span class="pull-right">
-                {{item.year}}
-              </span>
-            </div>
+          <div *ngIf="item.year">
+            <span class="text-secondary">Year</span>
+            <span class="pull-right text-overflow">{{item.year}}</span>
           </div>
-          <div class="row" *ngIf="item.make">
-            <div class="col">
-              Make
-              <span class="pull-right">
-                {{item.make}}
-              </span>
-            </div>
+          <div *ngIf="item.make">
+            <span class="text-secondary">Make</span>
+            <span class="pull-right text-overflow">{{item.make}}</span>
           </div>
-          <div class="row" *ngIf="item.model">
-            <div class="col">Model
-              <span class="pull-right">
-              {{item.model}}
+          <div *ngIf="item.model">
+            <span class="text-secondary">Model</span>
+            <span class="pull-right text-overflow">{{item.model}}</span>
+          </div>
+          <div *ngIf="item.engineManufacturer || item.engineModel">
+            <span class="text-secondary">Engine</span>
+            <span class="pull-right text-overflow">
+              {{inventoryService.getEngineName(item)}}
             </span>
-            </div>
           </div>
-          <div class="row" *ngIf="item.engineManufacturer">
-            <div class="col">Engine
-              <span class="pull-right">
-              {{item.engineManufacturer}}
-            </span>
-            </div>
+          <div *ngIf="item.transmission || item.transmissionManufacturer">
+            <span class="text-secondary">Transmission</span>
+            <span
+              class="pull-right text-overflow">{{ [item.transmissionManufacturer, item.transmission].join(' ') }}</span>
           </div>
-          <div class="row" *ngIf="item.transmission">
-            <div class="col">Transmission
-              <span class="pull-right">
-                {{item.transmission}}
-              </span>
-            </div>
+          <div *ngIf="item.suspension">
+            <span class="text-secondary">Suspension</span>
+            <span class="pull-right text-overflow">{{item.suspension}}</span>
           </div>
-          <div class="row" *ngIf="item.suspension">
-            <div class="col">
-              Suspension
-              <span class="pull-right">
-                {{item.suspension}}
-              </span>
-            </div>
+          <div *ngIf="item.odometer">
+            <span class="text-secondary">Mileage</span>
+            <span class="pull-right text-overflow">{{item.odometer | number }}</span>
           </div>
-          <div class="row" *ngIf="item.odometer">
-            <div class="col">
-              Mileage
-              <span class="pull-right">{{item.odometer | number }}</span>
-            </div>
-          </div>
-          <div class="row" *ngIf="item.price">
-            <div class="col">
-              Price
-              <span class="pull-right">{{item.price | currency:'USD':'symbol':'1.0-2' }}</span>
-            </div>
+          <div *ngIf="item.price">
+            <span class="text-secondary">Price</span>
+            <span class="pull-right text-overflow">{{item.price | currency:'USD':'symbol':'1.0-2' }}</span>
           </div>
         </div>
         <div class="card-footer">
@@ -130,7 +109,7 @@
             </div>
           </div>
           <div class="btn-group d-flex" *ngIf="(authService.user | async)?.admin">
-            <a class="btn btn-primary w-100" [routerLink]="[ item.id, 'edit']">
+            <a class="btn btn-primary w-100" [routerLink]="[ inventoryService.getUrl(item), 'edit']">
               Edit
             </a>
             <button type="button" class="btn btn-danger w-100" (click)="delete(item)">
@@ -141,9 +120,12 @@
       </div>
     </div>
   </div>
-  <div class="row" *ngIf="(inventory | async)?.length == 0">
-    <div class="col">
-      <p class="lead">Sorry, no results found!</p>
+  <div class="row" *ngIf="inventory.length === 0">
+    <div class="col text-muted">
+      Sorry, no results found!
+      <span class="text-muted" *ngIf="category.name !== 'All'">
+        You might have luck looking in other categories.
+      </span>
     </div>
   </div>
-</div>-
+</div>
