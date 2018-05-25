@@ -8,8 +8,12 @@
     ],
     "rewrites": [
       {
-        "source": "/sitemap.xml",
+        "source": "/sitemap/**",
         "function": "sitemap"
+      },
+      {
+        "source": "/commercial-truck-trader/**",
+        "function": "ctt"
       },
       {
         "source": "**",

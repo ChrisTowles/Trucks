@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col">
       <ol class="breadcrumb mt-2">
-        <li class="breadcrumb-item"><a [routerLink]="['/inventory']">Inventory</a></li>
+        <li class="breadcrumb-item"><a [routerLink]="['']">Inventory</a></li>
         <li class="breadcrumb-item active">{{ item.name }}</li>
       </ol>
     </div>
@@ -10,6 +10,12 @@
   <h1> {{ item.name }}</h1>
   <div class="row">
     <div class="col-12 col-md-6">
+      <div *ngIf="item.video_url" class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item  pb-3"
+                [src]="video_url"
+                allowfullscreen>
+        </iframe>
+      </div>
       <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
     </div>
     <div class="col-12 col-md-6">
@@ -140,7 +146,7 @@
          [queryParams]="{subject: item.stockNumber ? 'Interest in #' + item.stockNumber: ''}">Contact Us
       </a>
 
-      <div class="btn-group d-flex pt-2" *ngIf="(authService.user | async)?.admin">
+      <div class="btn-group d-flex pt-2" *ngIf="authService.isAdmin | async">
         <a class="btn btn-primary w-100" [routerLink]="['edit']">Edit</a>
         <button type="button" class="btn btn-danger w-100" (click)="delete()">Delete</button>
       </div>

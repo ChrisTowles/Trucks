@@ -1,0 +1,35 @@
+[debug] [2018-02-28T10:17:18.725Z] ----------------------------------------------------------------------
+[debug] [2018-02-28T10:17:18.728Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\james\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve --only functions
+[debug] [2018-02-28T10:17:18.729Z] CLI Version:   3.17.4
+[debug] [2018-02-28T10:17:18.729Z] Platform:      win32
+[debug] [2018-02-28T10:17:18.729Z] Node Version:  v6.11.5
+[debug] [2018-02-28T10:17:18.729Z] Time:          Wed Feb 28 2018 05:17:18 GMT-0500 (Eastern Standard Time)
+[debug] [2018-02-28T10:17:18.729Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-02-28T10:17:18.743Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-02-28T10:17:18.743Z] > authorizing via signed-in user
+[debug] [2018-02-28T10:17:18.745Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/firebase-craigmyle-trucks  
+  
+ Wed Feb 28 2018 05:17:18 GMT-0500 (Eastern Standard Time)
+[debug] [2018-02-28T10:17:19.116Z] <<< HTTP RESPONSE 200
+[debug] [2018-02-28T10:17:19.117Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/craigmyle-trucks/tokens  
+  
+ Wed Feb 28 2018 05:17:19 GMT-0500 (Eastern Standard Time)
+[debug] [2018-02-28T10:17:19.560Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'C:\Users\james\WebstormProjects\Trucks'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-02-28T10:17:19.966Z] Fetching environment
+[debug] [2018-02-28T10:17:19.967Z] >>> HTTP REQUEST GET https://appengine.googleapis.com/v1/apps/firebase-craigmyle-trucks  
+  
+ Wed Feb 28 2018 05:17:19 GMT-0500 (Eastern Standard Time)
+[debug] [2018-02-28T10:17:19.968Z] >>> HTTP REQUEST GET https://apikeys.googleapis.com/v1/projects/firebase-craigmyle-trucks/apiKeys  
+  
+ Wed Feb 28 2018 05:17:19 GMT-0500 (Eastern Standard Time)
+[debug] [2018-02-28T10:17:20.186Z] <<< HTTP RESPONSE 200
+[debug] [2018-02-28T10:17:20.363Z] <<< HTTP RESPONSE 200
+[debug] [2018-02-28T10:17:20.363Z] Starting @google-cloud/functions-emulator
+[debug] [2018-02-28T10:17:21.975Z] Parsing function triggers
+[info] +  functions: sitemap: http://localhost:5000/firebase-craigmyle-trucks/us-central1/sitemap
+[info] +  functions: commercialTruckTrader: http://localhost:5000/firebase-craigmyle-trucks/us-central1/commercialTruckTrader

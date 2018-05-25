@@ -8,10 +8,11 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LocalStorageService} from 'angular-2-local-storage';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
 import {ToastrService} from 'ngx-toastr';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
 import {InventoryAddComponent} from '../inventory-add/inventory-add.component';
 import {InventoryDeleteComponent} from '../inventory-delete/inventory-delete.component';
+
+import {BehaviorSubject, combineLatest} from 'rxjs';
+import {map, take, tap} from 'rxjs/operators';
 
 interface Category {
   name: string;
@@ -29,10 +30,17 @@ export class InventoryListComponent {
   inventory: EquipmentId[] = [];
   searchForm: FormGroup;
   admin = false;
+
   categories: Category[] = [{name: 'All', count: 0}];
   category: Category = this.categories[0];
-  adminFilter$: BehaviorSubject<boolean | null>;
   categoryFilter$: BehaviorSubject<string | null>;
+
+  statuses: Status[] = [{name: 'All', value: null}];
+  status: Status;
+  statusFilter$: BehaviorSubject<EquipmentStatus | null>;
+
+  adminFilter$: BehaviorSubject<boolean | null>;
+
   searchFilter$: BehaviorSubject<string | null>;
 
   constructor(private afs: AngularFirestore,
@@ -47,9 +55,22 @@ export class InventoryListComponent {
               private meta: Meta,
               private title: Title) {
 
+    // Redirect if /inventory
+    if (this.router.url === '/inventory') {
+      this.router.navigate(['/']);
+    }
+
     this.adminFilter$ = new BehaviorSubject(null);
     this.categoryFilter$ = new BehaviorSubject(this.localStorageService.get<string>('list-category') || 'All');
+    this.statusFilter$ = new BehaviorSubject(this.localStorageService.get<number>('list-status'));
     this.searchFilter$ = new BehaviorSubject(null);
+
+    for (const es in EquipmentStatus) {
+      if (isNaN(Number(es))) {
+        this.statuses.push({name: es, value: Number(EquipmentStatus[es])});
+      }
+    }
+    this.status = this.statuses.find(a => a.value === this.statusFilter$.getValue());
 
     this.createForm();
 
@@ -60,99 +81,110 @@ export class InventoryListComponent {
       });
 
     // Update Categories
-    Observable.combineLatest(
-      this.authService.user,
-    ).switchMap(([user]) => {
-      return this.afs.collection<Equipment>('inventory', ref => {
-        let query = ref.orderBy('stockNumber', 'desc');
-        // Filter by status based on admin
-        if (!user || !user.admin) {
-          query = query.where('status', '==', 1);
-        }
-        // Order by stockNumber
-        return query;
-      })
-        .valueChanges();
-    })
-      .subscribe(equip => {
-        // Build object with category counts
-        const categories = equip.map(a => a.category);
-        const result = {};
-        for (let i = 0; i < categories.length; ++i) {
-          if (!result[categories[i]]) {
-            result[categories[i]] = 0;
+
+    this.authService.user.subscribe(
+      (user) => {
+
+        const equipment$ = this.afs.collection<Equipment>('inventory', ref => {
+          let query = ref.orderBy('stockNumber', 'desc');
+          // Filter by status based on admin
+          if (!user || !user.admin) {
+            query = query.where('status', '==', 1);
           }
-          ++result[categories[i]];
-        }
+          // Order by stockNumber
+          return query;
+        }).valueChanges();
 
-        // Remove everything but All and update total
-        this.categories = this.categories.filter(a => a.name === 'All');
-        this.categories[0].count = equip.length;
+        equipment$.subscribe((equip) => {
 
-        // Add other categories with count
-        for (const x of Object.keys(result)) {
-          this.categories.push({name: x, count: result[x]});
-        }
+          // Build object with category counts
+          const categories = equip.map(a => a.category);
 
-        // Set back to stored value if present
-        const name = this.localStorageService.get<string>('list-category') || 'All';
-        let index = this.categories.findIndex(a => a.name === name);
-        if (index < 0) {
-          index = 0;
-        }
-        this.category = this.categories[index];
-      });
+          const result = {};
+          for (let i = 0; i < categories.length; ++i) {
+            if (!result[categories[i]]) {
+              result[categories[i]] = 0;
+            }
+            ++result[categories[i]];
+          }
+
+          // Remove everything but All and update total
+          this.categories = this.categories.filter(a => a.name === 'All');
+          this.categories[0].count = equip.length;
+
+          // Add other categories with count
+          for (const x of Object.keys(result)) {
+            this.categories.push({name: x, count: result[x]});
+          }
+
+          // Set back to stored value if present
+          const name = this.localStorageService.get<string>('list-category') || 'All';
+          let index = this.categories.findIndex(a => a.name === name);
+          if (index < 0) {
+            index = 0;
+          }
+          this.category = this.categories[index];
+
+        });
+      }
+    );
 
 
     // Update inventory
-    Observable.combineLatest(
+    combineLatest(
       this.searchFilter$,
       this.authService.user,
-      this.categoryFilter$
-    ).switchMap(([search, user, category]) => {
-      // Update admin
-      this.admin = user && user.admin;
+      this.categoryFilter$,
+      this.statusFilter$,
+      (search, user, category, status) => {
+        // Update admin
+        this.admin = user && user.admin;
 
-      // Get Inventory
-      this.inventoryCollection = this.afs.collection<Equipment>('inventory', ref => {
-        let query = ref.orderBy('stockNumber', 'desc');
-        // Filter by Category
-        if (category && category !== 'All') {
-          query = query.where('category', '==', category);
-        }
-        // Filter by status based on admin
-        if (!user || !user.admin) {
-          query = query.where('status', '==', 1);
-        }
-        // Order by stockNumber
-        return query;
-      });
+        // Get Inventory
+        this.inventoryCollection = this.afs.collection<Equipment>('inventory', ref => {
+          // Order by stockNumber
+          let query = ref.orderBy('stockNumber', 'desc');
 
-      return this.inventoryCollection.snapshotChanges()
-        .map(actions => actions.map(a => {
-          const data = a.payload.doc.data() as Equipment;
-          const id = a.payload.doc.id;
-          return {id, ...data};
-        }))
-        .map(equip => equip.filter(a => {
-          if (search !== '') {
-            return Object.keys(a).some(k => {
-              if (typeof a[k] === 'string') {
-                return a[k].toLowerCase().includes(search.toLowerCase());
-              } else {
-                return false;
-              }
-            });
-          } else {
-            return true;
+          // Filter by Category
+          if (category && category !== 'All') {
+            query = query.where('category', '==', category);
           }
-        }));
-    })
-      .subscribe(equip => {
-        this.inventory = equip;
+          // Filter by status based on admin
+          if (!user || !user.admin) {
+            query = query.where('status', '==', EquipmentStatus.Visible);
+          } else if (status != null) {
+            query = query.where('status', '==', status);
+          }
 
-      });
+          return query;
+        });
 
+        this.inventoryCollection.snapshotChanges()
+          .pipe(
+            map(actions => actions.map(a => {
+              const data = a.payload.doc.data() as Equipment;
+              const id = a.payload.doc.id;
+              return {id, ...data};
+            })),
+            map(equip => equip.filter(a => {
+              if (search !== '') {
+                return Object.keys(a).some(k => {
+                  if (typeof a[k] === 'string') {
+                    return a[k].toLowerCase().includes(search.toLowerCase());
+                  } else {
+                    return false;
+                  }
+                });
+              } else {
+                return true;
+              }
+            })),
+            tap(equip => {
+              this.inventory = equip;
+            })
+          );
+      }
+    );
 
     this.meta.addTags([
       {name: 'description', content: 'Inventory Page for Craigmyle Trucks'}
@@ -181,7 +213,12 @@ export class InventoryListComponent {
     this.category = category;
     this.categoryFilter$.next(category.name);
     this.localStorageService.set('list-category', category.name);
+  }
 
+  setStatus(status: Status) {
+    this.status = status;
+    this.statusFilter$.next(status.value);
+    this.localStorageService.set('list-status', status.value);
   }
 
   searchClear() {
@@ -201,8 +238,9 @@ export class InventoryListComponent {
       if (result.stockNumber) {
         // Check if stockNumber is already in use
         this.afs.collection<Equipment>('inventory', ref => ref.where('stockNumber', '==', result.stockNumber))
-          .snapshotChanges()
-          .take(1)
+          .snapshotChanges().pipe(
+          take(1)
+        )
           .subscribe(equipment => {
             if (equipment.length === 0) {
               const tmp = {
@@ -258,4 +296,22 @@ export class InventoryListComponent {
     });
 
   }
+
+  toggleCommericalTruckTrader(item: EquipmentId) {
+    item.commercialTruckTrader = !item.commercialTruckTrader;
+    const itemDoc = this.afs.doc<Equipment>(`inventory/${item.id}`);
+    itemDoc.update({commercialTruckTrader: item.commercialTruckTrader})
+      .then(value => {
+        this.toastr.success(`Saved ${item.name}`, 'Success');
+      })
+      .catch(reason => {
+        this.toastr.error(`${reason.toString()}`, 'Failed');
+        console.error(reason);
+      });
+  }
+}
+
+interface Status {
+  value: number | null;
+  name: string;
 }

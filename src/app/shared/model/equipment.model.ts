@@ -31,11 +31,14 @@ export interface Equipment {
   frontTireSize: string;
   rearTireSize: string;
   img_public_id: string;
-
+  video_url: string;
 
   // Internal
   order: number;
   status: EquipmentStatus;
+
+  // Posting
+  commercialTruckTrader: boolean;
 }
 
 export interface EquipmentId extends Equipment {
@@ -46,4 +49,5 @@ export interface EquipmentId extends Equipment {
 export enum EquipmentStatus {
   Hidden = 0,
   Visible = 1,
+  Archived = 2
 }

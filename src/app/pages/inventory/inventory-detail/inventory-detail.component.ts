@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Meta, Title} from '@angular/platform-browser';
+import {DomSanitizer, Meta, SafeResourceUrl, Title} from '@angular/platform-browser';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {AuthService, InventoryService} from '@app/core';
 import {Equipment, EquipmentId, EquipmentImage, EquipmentOption} from '@app/shared';
@@ -21,6 +21,8 @@ export class InventoryDetailComponent implements OnInit {
   private imageCollection: AngularFirestoreCollection<EquipmentImage>;
   item: EquipmentId;
   options: string[] = [];
+  video_url: SafeResourceUrl;
+
   galleryOptions: NgxGalleryOptions[] = [
     {
       width: '100%',
@@ -32,12 +34,12 @@ export class InventoryDetailComponent implements OnInit {
       previewCloseOnEsc: true,
       previewKeyboardNavigation: true,
 
-      arrowPrevIcon: 'fa fa-arrow-circle-left',
-      arrowNextIcon: 'fa fa-arrow-circle-right',
+      arrowPrevIcon: 'fa fa-arrow-circle-left color-black',
+      arrowNextIcon: 'fa fa-arrow-circle-right color-black',
 
       thumbnails: true,
-      thumbnailSize: NgxGalleryImageSize.Contain,
-      thumbnailsRows: 2,
+      thumbnailSize: NgxGalleryImageSize.Cover,
+      thumbnailsRows: 3,
       thumbnailsSwipe: true,
     }
   ];
@@ -51,9 +53,11 @@ export class InventoryDetailComponent implements OnInit {
               private authService: AuthService,
               private inventoryService: InventoryService,
               private toastr: ToastrService,
+              public sanitizer: DomSanitizer,
               private meta: Meta,
               private title: Title) {
   }
+
 
   ngOnInit() {
 
@@ -80,6 +84,7 @@ export class InventoryDetailComponent implements OnInit {
           this.item = {id, ...data};
           this.itemDoc = this.afs.doc<Equipment>(`inventory/${id}`);
           this.updateMetaData();
+          this.video_url = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.item.video_url + '?rel=0');
 
           // Get Items
           this.afs.collection<EquipmentOption>(`inventory/${id}/options`)
@@ -95,7 +100,7 @@ export class InventoryDetailComponent implements OnInit {
           this.imageCollection.valueChanges()
             .subscribe(images => {
               images
-                .forEach(img => {
+                .forEach((img, index, arr) => {
                   this.galleryImages.push({
                     small: this.cloudinary.url(img.public_id, {width: 256, crop: 'scale', fetch_format: 'auto'}),
                     medium: this.cloudinary.url(img.public_id, {width: 512, crop: 'scale', fetch_format: 'auto'}),
@@ -128,7 +133,7 @@ export class InventoryDetailComponent implements OnInit {
       if (result === 'delete') {
         this.itemDoc.delete()
           .then(value => {
-            this.router.navigate(['../../'], {relativeTo: this.activatedRoute});
+            this.router.navigate(['/']);
             this.toastr.success(`Deleted ${this.item.name}`, 'Success');
           })
           .catch(reason => {

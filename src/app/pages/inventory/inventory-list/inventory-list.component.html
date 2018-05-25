@@ -27,7 +27,18 @@
     </div>
     <div class="col">
       <div class="float-right">
-        <div ngbDropdown class="d-inline-block">
+        <div *ngIf="authService.isAdmin | async" ngbDropdown placement="bottom-right" class="d-inline-block">
+          <button class="btn btn-secondary" ngbDropdownToggle>
+            Status: {{ status.name }}
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item" *ngFor="let o of statuses" (click)="setStatus(o)"
+                    [disabled]="status.name === o.name">
+              {{ o.name }}
+            </button>
+          </div>
+        </div>
+        <div ngbDropdown placement="bottom-right" class="d-inline-block">
           <button class="btn btn-secondary" id="dropdownBasic1" ngbDropdownToggle>
             Category: {{ category.name }} ({{category.count}})
           </button>
@@ -41,29 +52,31 @@
           </div>
         </div>
         <button type="button" class="btn btn-primary" (click)="add()"
-                *ngIf="(authService.user | async)?.admin">
+                *ngIf="authService.isAdmin | async">
           <i class="fa fa-plus"></i> Add
         </button>
       </div>
     </div>
   </div>
   <div class="row" *ngIf="inventory.length != 0">
-    <div class="col-lg-4 col-md-6 col-12 mb-3"
+    <div class="col-lg-4 col-md-6 col-12 mb-3 border-"
          *ngFor="let item of inventory; let i = index ">
       <div class="card h-100" [ngClass]="{
-      'border-primary': item.status != 0,
-      'border-danger': item.status == 0
+      'border-danger': item.status == 0,
+      'border-primary': item.status == 1,
+      'border-warning': item.status == 2
       }">
-        <a [routerLink]="[inventoryService.getUrl(item)]">
+        <a [routerLink]="['inventory', inventoryService.getUrl(item)]">
           <ng-container *ngIf="item.img_public_id; else noImg">
             <cl-image public-id="{{item.img_public_id}}" class="card-img-top">
               <cl-transformation width="350" fetch_format="auto" crop="scale">
               </cl-transformation>
             </cl-image>
           </ng-container>
+
         </a>
         <div class="card-body">
-          <a [routerLink]="[inventoryService.getUrl(item)]">
+          <a [routerLink]="['inventory', inventoryService.getUrl(item)]">
             <h4 class="card-title text-center">{{ item.name }}</h4>
           </a>
           <div *ngIf="item.year">
@@ -108,13 +121,20 @@
               Stock # {{ item.stockNumber || 'N/A'}}
             </div>
           </div>
-          <div class="btn-group d-flex" *ngIf="(authService.user | async)?.admin">
-            <a class="btn btn-primary w-100" [routerLink]="[ inventoryService.getUrl(item), 'edit']">
+          <div class="btn-group d-flex" *ngIf="authService.isAdmin | async">
+            <a class="btn btn-primary w-100" [routerLink]="[ 'inventory', inventoryService.getUrl(item), 'edit']">
               Edit
             </a>
             <button type="button" class="btn btn-danger w-100" (click)="delete(item)">
               Delete
             </button>
+          </div>
+          <div class="form-check py-2" *ngIf="authService.isAdmin | async">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" [checked]="item.commercialTruckTrader"
+                     (change)="toggleCommericalTruckTrader(item)">
+              Commercial Truck Trader
+            </label>
           </div>
         </div>
       </div>

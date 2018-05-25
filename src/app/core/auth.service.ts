@@ -2,11 +2,11 @@ import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {AngularFireAuth} from 'angularfire2/auth';
-import * as firebase from 'firebase/app';
-import {Observable} from 'rxjs/Observable';
 import {AngularFirestore, AngularFirestoreDocument} from 'angularfire2/firestore';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/take';
+import * as firebase from 'firebase/app';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {map, switchMap, take} from 'rxjs/operators';
+
 
 export interface UserBasic {
   id: string;
@@ -22,22 +22,34 @@ export interface User extends UserBasic {
 @Injectable()
 export class AuthService {
   user: Observable<User>;
-
+  isAdmin: BehaviorSubject<boolean | null>;
 
   constructor(private afs: AngularFirestore,
               private afAuth: AngularFireAuth,
               private router: Router) {
 
+
+
     // Listen for authState changes
-    this.user = this.afAuth.authState
-      .switchMap(user => {
+    this.user = this.afAuth.authState.pipe(
+      switchMap(user => {
         if (user) {
           return this.afs.doc<User>(`users/${user.uid}`).valueChanges();
         } else {
           /// not signed in
-          return Observable.of(null);
+          return of(null);
         }
-      });
+      })
+    );
+
+    this.isAdmin = new BehaviorSubject(false);
+    this.user.subscribe(user => {
+      if (user && user.admin) {
+        this.isAdmin.next(true);
+      } else {
+        this.isAdmin.next(false);
+      }
+    });
   }
 
   signInWithGoogle() {
@@ -72,27 +84,18 @@ export class AuthService {
     };
 
     return userRef.snapshotChanges()
-      .take(1)
-      .map(doc => {
-        if (doc.payload.exists) {
-          const oldData = doc.payload.data() as User;
-          const roleData = {admin: oldData.admin};
-          return userRef.set({...data, ...roleData});
-        } else {
-          return userRef.set({...data});
-        }
-      });
-  }
-
-  isAdmin(): Observable<boolean> {
-    return this.user
-      .take(1)
-      .map(user => {
-        if (user) {
-          return user.admin;
-        }
-        return false;
-      });
+      .pipe(
+        take(1),
+        map(doc => {
+          if (doc.payload.exists) {
+            const oldData = doc.payload.data() as User;
+            const roleData = {admin: oldData.admin};
+            return userRef.set({...data, ...roleData});
+          } else {
+            return userRef.set({...data});
+          }
+        })
+      );
   }
 }
 

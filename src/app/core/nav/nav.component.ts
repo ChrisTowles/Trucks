@@ -42,7 +42,7 @@ export class NavComponent {
   search() {
     const text = this.searchForm.value.searchText;
     this.searchForm.setValue({searchText: ''});
-    this.router.navigate(['/inventory'], {queryParams: {search: text}});
+    this.router.navigate(['/'], {queryParams: {search: text}});
   }
 
 

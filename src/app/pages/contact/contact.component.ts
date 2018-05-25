@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {AngularFirestore} from 'angularfire2/firestore';
-import {Subject} from 'rxjs/Subject';
-import {debounceTime} from 'rxjs/operator/debounceTime';
-import {LocalStorageService} from 'angular-2-local-storage';
-import 'rxjs/add/observable/zip';
-import 'rxjs/add/observable/forkJoin';
-import {ActivatedRoute} from '@angular/router';
 import {Meta, Title} from '@angular/platform-browser';
+import {ActivatedRoute} from '@angular/router';
+import {LocalStorageService} from 'angular-2-local-storage';
+import {AngularFirestore} from 'angularfire2/firestore';
+import {ToastrService} from 'ngx-toastr';
+
+import {Subject} from 'rxjs';
+import {debounceTime, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-contact',
@@ -24,6 +24,7 @@ export class ContactComponent implements OnInit {
               private afs: AngularFirestore,
               private localStorageService: LocalStorageService,
               private activatedRoute: ActivatedRoute,
+              private toastr: ToastrService,
               private meta: Meta,
               private title: Title) {
 
@@ -48,8 +49,11 @@ export class ContactComponent implements OnInit {
 
   ngOnInit() {
 
-    this._success.subscribe((message) => this.successMessage = message);
-    debounceTime.call(this._success, 5000).subscribe(() => this.successMessage = null);
+    this._success.pipe(
+      tap((message) => this.successMessage = message),
+      debounceTime(5000),
+      tap(() => this.successMessage = null)
+    );
 
     // Load values for form from storage so users can reuse it quickly
     this.contactForm.patchValue({
@@ -80,6 +84,7 @@ export class ContactComponent implements OnInit {
       this.localStorageService.set('contact-lastName', data.lastName);
       this.localStorageService.set('contact-email', data.email);
       this.contactForm.reset({firstName: data.firstName, lastName: data.lastName, email: data.email});
+      this.toastr.success(`Thanks for sending us a messages.`, 'Success');
     });
 
   }

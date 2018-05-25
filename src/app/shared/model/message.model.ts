@@ -3,7 +3,7 @@ export interface Message {
   lastName: string;
   email: string;
   subject: string;
-  message: number;
+  message: string;
   read: boolean;
 }
 

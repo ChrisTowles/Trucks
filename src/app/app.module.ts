@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {NgModule, NO_ERRORS_SCHEMA} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -33,7 +33,6 @@ import {VinToolComponent} from './pages/admin/vin-tool/vin-tool.component';
 import {ContactComponent} from './pages/contact/contact.component';
 import {DirectionsComponent} from './pages/directions/directions.component';
 
-import {HomeComponent} from './pages/home/home.component';
 import {InventoryAddComponent} from './pages/inventory/inventory-add/inventory-add.component';
 import {InventoryDeleteComponent} from './pages/inventory/inventory-delete/inventory-delete.component';
 import {InventoryDetailComponent} from './pages/inventory/inventory-detail/inventory-detail.component';
@@ -42,6 +41,9 @@ import {InventoryEquipmentComponent} from './pages/inventory/inventory-equipment
 import {InventoryListComponent} from './pages/inventory/inventory-list/inventory-list.component';
 
 import {InventoryComponent} from './pages/inventory/inventory.component';
+
+import {MDBBootstrapModulesPro, MDBSpinningPreloader} from 'ng-uikit-pro-standard';
+
 
 @NgModule({
   imports: [
@@ -64,10 +66,10 @@ import {InventoryComponent} from './pages/inventory/inventory.component';
       storageType: 'localStorage'
     }),
     Angulartics2Module.forRoot([Angulartics2GoogleAnalytics]),
+    MDBBootstrapModulesPro.forRoot(),
   ],
   declarations: [
     AppComponent,
-    HomeComponent,
     AboutComponent,
     ContactComponent,
     InventoryComponent,
@@ -84,12 +86,15 @@ import {InventoryComponent} from './pages/inventory/inventory.component';
     VinToolComponent,
     InventoryAddComponent
   ],
-  providers: [],
+  providers: [
+    MDBSpinningPreloader
+  ],
   entryComponents: [
     InventoryAddComponent,
     InventoryDeleteComponent
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [NO_ERRORS_SCHEMA]
 })
 
 export class AppModule {

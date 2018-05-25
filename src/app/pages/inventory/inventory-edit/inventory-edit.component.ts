@@ -8,7 +8,9 @@ import {Cloudinary} from '@cloudinary/angular-5.x';
 import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument} from 'angularfire2/firestore';
 import {FileUploader, FileUploaderOptions, ParsedResponseHeaders} from 'ng2-file-upload';
 import {ToastrService} from 'ngx-toastr';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
+import {debounceTime, distinctUntilChanged, map, take, tap} from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-inventory-edit',
@@ -222,7 +224,8 @@ export class InventoryEditComponent implements OnInit {
       odometer: ['', [Validators.pattern('[0-9]*')]],
       price: ['', [Validators.pattern('[0-9]*')]],
       comments: '',
-      status: ''
+      status: '',
+      video_url: ''
     });
   }
 
@@ -263,7 +266,9 @@ export class InventoryEditComponent implements OnInit {
           this.itemOptionsCollection = this.afs.collection<EquipmentOption>(`inventory/${this.item.id}/options`);
 
           this.itemOptionsCollection.snapshotChanges()
-            .take(1)
+            .pipe(
+              take(1)
+            )
             .subscribe(options => {
 
               this.inventoryService.equipmentOptions.forEach(o => {
@@ -275,16 +280,16 @@ export class InventoryEditComponent implements OnInit {
               });
 
               options.map(a => {
-                const data = a.payload.doc.data() as EquipmentOption;
-                const id = a.payload.doc.id;
-                const index = this.formOptions.options.findIndex(value => value.name === data.name);
+                const d = a.payload.doc.data() as EquipmentOption;
+                const new_id = a.payload.doc.id;
+                const index = this.formOptions.options.findIndex(value => value.name === d.name);
                 if (index >= 0) {
                   this.formOptions.options[index].value = true;
-                  this.formOptions.options[index].id = id;
+                  this.formOptions.options[index].id = new_id;
                 } else {
                   this.formOptions.options.push({
-                    id: id,
-                    name: data.name,
+                    id: new_id,
+                    name: d.name,
                     value: true
                   });
                 }
@@ -296,29 +301,31 @@ export class InventoryEditComponent implements OnInit {
             ref.orderBy('order', 'asc')
           );
           this.images$ = this.imageCollection.snapshotChanges()
-            .map(actions => {
-              return actions
-                .map(a => {
-                  const data = a.payload.doc.data() as EquipmentImage;
-                  const id = a.payload.doc.id;
-                  return {id, ...data};
-                });
-            })
-            .do(images => {
-              this.images = images;
+            .pipe(
+              map(actions => {
+                return actions
+                  .map(a => {
+                    const data = a.payload.doc.data() as EquipmentImage;
+                    const id = a.payload.doc.id;
+                    return {id, ...data};
+                  });
+              }),
+              tap(images => {
+                this.images = images;
 
-              // Save the current max order, if not set start at -1 so first will be 0
-              if (images.length === 0) {
-                this.imageOrderMax = -1;
-              } else {
-                this.imageOrderMax = images[images.length - 1].order;
+                // Save the current max order, if not set start at -1 so first will be 0
+                if (images.length === 0) {
+                  this.imageOrderMax = -1;
+                } else {
+                  this.imageOrderMax = images[images.length - 1].order;
 
-                // Check if primary image needs to be updated
-                if (this.item.img_public_id !== images[0].public_id) {
-                  this.itemDoc.update({img_public_id: images[0].public_id});
+                  // Check if primary image needs to be updated
+                  if (this.item.img_public_id !== images[0].public_id) {
+                    this.itemDoc.update({img_public_id: images[0].public_id});
+                  }
                 }
-              }
-            });
+              })
+            );
 
           this.setupUploader();
 
@@ -488,21 +495,26 @@ export class InventoryEditComponent implements OnInit {
 
 
   searchTransmissionManufacturer = (text$: Observable<string>) =>
-    text$.debounceTime(200)
-      .distinctUntilChanged()
-      .map(term => term === '' ? this.formOptions.transmissionManufacturers :
-        this.formOptions.transmissionManufacturers.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term === '' ? this.formOptions.transmissionManufacturers :
+        this.formOptions.transmissionManufacturers.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    );
 
   searchTransmission = (text$: Observable<string>) =>
-    text$.debounceTime(200)
-      .distinctUntilChanged()
-      .map(term => term === '' ? this.formOptions.transmissionManufacturers :
-        this.formOptions.transmission.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term === '' ? this.formOptions.transmissionManufacturers :
+        this.formOptions.transmission.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    );
 
   searchCategory = (text$: Observable<string>) =>
-    text$.debounceTime(200)
-      .distinctUntilChanged()
-      .map(term => term === '' ? this.formOptions.categories :
-        this.formOptions.categories.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10));
-
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term === '' ? this.formOptions.categories :
+        this.formOptions.categories.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+    );
 }
