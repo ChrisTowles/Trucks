@@ -9,13 +9,13 @@ import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument} 
 import {FileUploader, FileUploaderOptions, ParsedResponseHeaders} from 'ng2-file-upload';
 import {ToastrService} from 'ngx-toastr';
 import {Observable} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, take, tap} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, map, take} from 'rxjs/operators';
 
 
 @Component({
   selector: 'app-inventory-edit',
   templateUrl: './inventory-edit.component.html',
-  styleUrls: ['./inventory-edit.component.scss']
+  styleUrls: ['./inventory-edit.component.scss'],
 })
 
 export class InventoryEditComponent implements OnInit {
@@ -25,7 +25,6 @@ export class InventoryEditComponent implements OnInit {
   private itemOptionsCollection: AngularFirestoreCollection<EquipmentOption>;
 
   private imageCollection: AngularFirestoreCollection<EquipmentImage>;
-  images$: Observable<EquipmentImageId[]>;
   images: EquipmentImageId[];
   imageOrderMax = 0;
   itemForm: FormGroup;
@@ -127,7 +126,7 @@ export class InventoryEditComponent implements OnInit {
       'Truck Bed',
       'Trailer',
       'Car',
-      'Other Equipment'
+      'Other Equipment',
     ].sort(),
     transmissionManufacturers: [
       'Aisin',
@@ -146,7 +145,7 @@ export class InventoryEditComponent implements OnInit {
       'Ultra-Shift 10',
       'Ultra-Shift 13',
       'Ultra-Shift 18',
-      'Volvo'
+      'Volvo',
     ],
     transmission: [
       '8LL',
@@ -172,8 +171,8 @@ export class InventoryEditComponent implements OnInit {
       'Man-6Spd',
       'Man-7Spd',
       'Man-8Spd',
-      'Man-9Spd'
-    ]
+      'Man-9Spd',
+    ],
   };
 
   public uploader: FileUploader;
@@ -225,7 +224,7 @@ export class InventoryEditComponent implements OnInit {
       price: ['', [Validators.pattern('[0-9]*')]],
       comments: '',
       status: '',
-      video_url: ''
+      video_url: '',
     });
   }
 
@@ -238,44 +237,33 @@ export class InventoryEditComponent implements OnInit {
     this.activatedRoute.parent.params.subscribe((params: Params) => {
       const name = params['name'];
 
-      this.afs.collection<Equipment>('inventory', ref =>
-        ref.where('stockNumber', '==', this.inventoryService.getStockNumberFromUri(name))
+      const equipment = this.afs.collection<Equipment>('inventory', ref =>
+        ref.where('stockNumber', '==', this.inventoryService.getStockNumberFromUri(name)),
       )
         .snapshotChanges()
-        .subscribe(equipment => {
-
-
-          if (equipment.length < 1) {
-            // No item found, route back to inventory
-            this.router.navigate(['/inventory']);
-            return;
-          } else {
-            if (equipment.length > 1) {
-              console.error('More than one equipment by that name was found.');
-            }
-          }
-
+        .pipe(
+          take(1),
+          map(equip => {
+            const data = equip[0].payload.doc.data() as Equipment;
+            const id = equip[0].payload.doc.id;
+            return {id, ...data};
+          }),
+        )
+        .subscribe((equip) => {
           // Set item
-          const data = equipment[0].payload.doc.data() as Equipment;
-          const id = equipment[0].payload.doc.id;
-          this.item = {id, ...data};
+          this.item = equip;
           this.itemForm.patchValue(this.item);
           this.itemDoc = this.afs.doc<Equipment>(`inventory/${this.item.id}`);
 
           // get options
-          this.itemOptionsCollection = this.afs.collection<EquipmentOption>(`inventory/${this.item.id}/options`);
-
-          this.itemOptionsCollection.snapshotChanges()
-            .pipe(
-              take(1)
-            )
+          const currentOptions = this.afs.collection<EquipmentOption>(`inventory/${this.item.id}/options`)
+            .snapshotChanges()
             .subscribe(options => {
-
               this.inventoryService.equipmentOptions.forEach(o => {
                 this.formOptions.options.push({
                   id: undefined,
                   name: o.name,
-                  value: false
+                  value: false,
                 });
               });
 
@@ -290,56 +278,50 @@ export class InventoryEditComponent implements OnInit {
                   this.formOptions.options.push({
                     id: new_id,
                     name: d.name,
-                    value: true
+                    value: true,
                   });
                 }
               });
             });
 
           // get images
-          this.imageCollection = this.afs.collection<EquipmentImage>(`inventory/${this.item.id}/images`, ref =>
-            ref.orderBy('order', 'asc')
-          );
-          this.images$ = this.imageCollection.snapshotChanges()
-            .pipe(
-              map(actions => {
-                return actions
-                  .map(a => {
-                    const data = a.payload.doc.data() as EquipmentImage;
-                    const id = a.payload.doc.id;
-                    return {id, ...data};
-                  });
-              }),
-              tap(images => {
-                this.images = images;
+          this.afs.collection<EquipmentImage>(`inventory/${this.item.id}/images`, ref =>
+            ref.orderBy('order', 'asc'),
+          )
+            .snapshotChanges()
+            .subscribe(images => {
 
-                // Save the current max order, if not set start at -1 so first will be 0
-                if (images.length === 0) {
-                  this.imageOrderMax = -1;
-                } else {
-                  this.imageOrderMax = images[images.length - 1].order;
+              this.images = images.map(img => {
+                const data = img.payload.doc.data() as EquipmentImage;
+                const id = img.payload.doc.id;
+                return {id, ...data};
+              });
 
-                  // Check if primary image needs to be updated
-                  if (this.item.img_public_id !== images[0].public_id) {
-                    this.itemDoc.update({img_public_id: images[0].public_id});
-                  }
+              // Save the current max order, if not set start at -1 so first will be 0
+              if (images.length === 0) {
+                this.imageOrderMax = -1;
+              } else {
+                this.imageOrderMax = this.images[this.images.length - 1].order;
+
+                // Check if primary image needs to be updated
+                if (this.item.img_public_id !== this.images[0].public_id) {
+                  this.itemDoc.update({img_public_id: this.images[0].public_id});
                 }
-              })
-            );
+              }
 
-          this.setupUploader();
-
+              this.setupUploader();
+            });
         });
     });
   }
 
-  private setupUploader() {
+  setupUploader() {
 
     const uploaderOptions: FileUploaderOptions = {
       url: `https://api.cloudinary.com/v1_1/${this.cloudinary.config().cloud_name}/upload`,
       // Upload files automatically upon addition to upload queue
       autoUpload: true,
-      // Use xhrTransport in favor of iframeTransport
+      // Use xhrTransport in favor of iFrameTransport
       isHTML5: true,
       // Calculate progress independently for each uploaded file
       removeAfterUpload: true,
@@ -347,9 +329,9 @@ export class InventoryEditComponent implements OnInit {
       headers: [
         {
           name: 'X-Requested-With',
-          value: 'XMLHttpRequest'
-        }
-      ]
+          value: 'XMLHttpRequest',
+        },
+      ],
     };
     this.uploader = new FileUploader(uploaderOptions);
 
@@ -421,12 +403,12 @@ export class InventoryEditComponent implements OnInit {
     });
   }
 
-  moveImageUp(img: EquipmentImageId, target: EquipmentImageId, img_public_id: string) {
+  moveImageUp(img: EquipmentImageId, target: EquipmentImageId) {
     this.imageCollection.doc(target.id).update({order: img.order});
     this.imageCollection.doc(img.id).update({order: target.order});
   }
 
-  moveImageDown(img: EquipmentImageId, target: EquipmentImageId, img_public_id: string) {
+  moveImageDown(img: EquipmentImageId, target: EquipmentImageId) {
     this.imageCollection.doc(target.id).update({order: img.order});
     this.imageCollection.doc(img.id).update({order: target.order});
   }
@@ -459,7 +441,7 @@ export class InventoryEditComponent implements OnInit {
             fuelType: vinData.FuelTypePrimary,
             gvwrClass: vinData.GVWR.replace(/\(.+\)/, '').trim(),
             driveType: vinData.DriveType,
-            brakeType: vinData.BrakeSystemType
+            brakeType: vinData.BrakeSystemType,
           };
           // Remove empty values
           Object.keys(newData)
@@ -476,10 +458,10 @@ export class InventoryEditComponent implements OnInit {
       name: [
         this.itemForm.value.year,
         this.itemForm.value.make,
-        this.itemForm.value.model
+        this.itemForm.value.model,
       ]
         .join(' ')
-        .trim()
+        .trim(),
     });
   }
 
@@ -499,22 +481,21 @@ export class InventoryEditComponent implements OnInit {
       debounceTime(200),
       distinctUntilChanged(),
       map(term => term === '' ? this.formOptions.transmissionManufacturers :
-        this.formOptions.transmissionManufacturers.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+        this.formOptions.transmissionManufacturers.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10)),
     );
 
-  searchTransmission = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => term === '' ? this.formOptions.transmissionManufacturers :
-        this.formOptions.transmission.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-    );
+  searchTransmission = (text$: Observable<string>) => text$.pipe(
+    debounceTime(200),
+    distinctUntilChanged(),
+    map(term => term === '' ? this.formOptions.transmissionManufacturers :
+      this.formOptions.transmission.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10)),
+  );
 
   searchCategory = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
       map(term => term === '' ? this.formOptions.categories :
-        this.formOptions.categories.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+        this.formOptions.categories.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10)),
     );
 }

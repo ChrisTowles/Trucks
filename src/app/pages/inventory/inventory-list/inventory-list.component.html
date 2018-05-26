@@ -1,72 +1,60 @@
 <ng-template #noImg>
   <img class="card-img-top" src="assets/img/no-image.svg" alt="No Image">
 </ng-template>
-<div class="jumbotron bg-primary">
-  <div class="container">
-    <h1>Inventory</h1>
-  </div>
-</div>
-<div class="container">
+<div class="container-fluid">
   <div class="row pb-2">
-    <div class="col">
-      <form class="form-inline" novalidate [formGroup]="searchForm">
-
-        <div class="input-group">
-          <input class="form-control" type="search" formControlName="searchText" placeholder="Search"
-                 aria-label="Search">
-          <div class="input-group-prepend">
-            <button class="btn btn-secondary" (click)="search()" [disabled]="searchForm.invalid">
-              <i class="fa fa-search" aria-hidden="true"></i>
-              Search
-            </button>
-          </div>
+    <div class="col-12 col-md-6">
+      <form novalidate [formGroup]="searchForm">
+        <div class="md-form">
+          <i class="fa fa-search prefix"></i>
+          <input type="text" formControlName="searchText" id="search" class="form-control" mdbInputDirective
+                 (change)="search()">
+          <label for="search">Search</label>
         </div>
-
-        <button class="btn btn-info ml-sm-2 mt-2 mt-sm-0" (click)="searchClear()">Clear</button>
       </form>
     </div>
-    <div class="col">
+    <div class="col-12 col-md-6">
       <div class="float-right">
-        <div *ngIf="authService.isAdmin | async" ngbDropdown placement="bottom-right" class="d-inline-block">
-          <button class="btn btn-secondary" ngbDropdownToggle>
+        <div class="btn-group" *ngIf="authService.isAdmin | async" dropdown>
+          <button dropdownToggle class="btn btn-secondary btn-sm dropdown-toggle waves-light" mdbWavesEffect>
             Status: {{ status.name }}
           </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <div class="dropdown-menu dropdown-menu-right">
             <button class="dropdown-item" *ngFor="let o of statuses" (click)="setStatus(o)"
                     [disabled]="status.name === o.name">
               {{ o.name }}
             </button>
           </div>
         </div>
-        <div ngbDropdown placement="bottom-right" class="d-inline-block">
-          <button class="btn btn-secondary" id="dropdownBasic1" ngbDropdownToggle>
+        <div class="btn-group" dropdown>
+          <button dropdownToggle class="btn btn-secondary btn-sm dropdown-toggle waves-light" mdbWavesEffect>
             Category: {{ category.name }} ({{category.count}})
           </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <div class="dropdown-menu  dropdown-menu-right">
             <button class="dropdown-item" *ngFor="let o of categories" (click)="setCategory(o)"
                     [disabled]="category.name === o.name">
               {{ o.name }}
               <span class="pull-right">({{o.count}})</span>
             </button>
-
           </div>
         </div>
-        <button type="button" class="btn btn-primary" (click)="add()"
-                *ngIf="authService.isAdmin | async">
+        <button type="button" class="btn btn-primary btn-sm waves-light" mdbWavesEffect
+                *ngIf="authService.isAdmin | async"
+                (click)="add()">
           <i class="fa fa-plus"></i> Add
         </button>
       </div>
     </div>
   </div>
   <div class="row" *ngIf="inventory.length != 0">
-    <div class="col-lg-4 col-md-6 col-12 mb-3 border-"
+    <div class="col-lg-4 col-md-6 col-12 mb-3 board-"
          *ngFor="let item of inventory; let i = index ">
-      <div class="card h-100" [ngClass]="{
+      <div class="card card-cascade h-100" [ngClass]="{
       'border-danger': item.status == 0,
       'border-primary': item.status == 1,
       'border-warning': item.status == 2
       }">
-        <a [routerLink]="['inventory', inventoryService.getUrl(item)]">
+        <div class="view overlay hm-white-slight waves-light" mdbWavesEffect>
           <ng-container *ngIf="item.img_public_id; else noImg">
             <cl-image public-id="{{item.img_public_id}}" class="card-img-top">
               <cl-transformation width="350" fetch_format="auto" crop="scale">
@@ -74,7 +62,11 @@
             </cl-image>
           </ng-container>
 
-        </a>
+          <a [routerLink]="['inventory', inventoryService.getUrl(item)]">
+            <div class="mask"></div>
+          </a>
+        </div>
+
         <div class="card-body">
           <a [routerLink]="['inventory', inventoryService.getUrl(item)]">
             <h4 class="card-title text-center">{{ item.name }}</h4>
@@ -114,13 +106,8 @@
             <span class="text-secondary">Price</span>
             <span class="pull-right text-overflow">{{item.price | currency:'USD':'symbol':'1.0-2' }}</span>
           </div>
-        </div>
-        <div class="card-footer">
-          <div class="row">
-            <div class="col text-muted text-right">
-              Stock # {{ item.stockNumber || 'N/A'}}
-            </div>
-          </div>
+
+
           <div class="btn-group d-flex" *ngIf="authService.isAdmin | async">
             <a class="btn btn-primary w-100" [routerLink]="[ 'inventory', inventoryService.getUrl(item), 'edit']">
               Edit
@@ -129,13 +116,23 @@
               Delete
             </button>
           </div>
-          <div class="form-check py-2" *ngIf="authService.isAdmin | async">
-            <label class="form-check-label">
-              <input type="checkbox" class="form-check-input" [checked]="item.commercialTruckTrader"
-                     (change)="toggleCommericalTruckTrader(item)">
-              Commercial Truck Trader
-            </label>
-          </div>
+          -
+        </div>
+        <div class="mdb-color lighten-3 text-center">
+          <ul class="list-unstyled list-inline font-small mt-3">
+            <li class="list-inline-item white-text"> <!--pr-2-->
+              Stock # {{ item.stockNumber || 'N/A'}}
+            </li>
+          </ul>
+
+
+          <!--<div class="form-check py-2" *ngIf="authService.isAdmin | async">-->
+          <!--<label class="form-check-label">-->
+          <!--<input type="checkbox" class="form-check-input" [checked]="item.commercialTruckTrader"-->
+          <!--(change)="toggleCommericalTruckTrader(item)">-->
+          <!--Commercial Truck Trader-->
+          <!--</label>-->
+          <!--</div>-->
         </div>
       </div>
     </div>

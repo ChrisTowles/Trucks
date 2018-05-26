@@ -7,13 +7,11 @@ import {NgbCollapseModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {AdminGuard} from './admin.guard';
 import {AuthService} from './auth.service';
 import {Error404Component} from './error404/error-404.component';
-import {FooterComponent} from './footer/footer.component';
 import {InventoryService} from './inventory.service';
 
-
+import {MDBBootstrapModulesPro} from 'ng-uikit-pro-standard';
 import {throwIfAlreadyLoaded} from './module-import-guard';
 
-import {NavComponent} from './nav/nav.component';
 
 @NgModule({
   imports: [
@@ -24,21 +22,17 @@ import {NavComponent} from './nav/nav.component';
     NgbDropdownModule,
     NgbCollapseModule,
     HttpClientModule,
+    MDBBootstrapModulesPro,
   ],
-  exports: [
-    NavComponent,
-    FooterComponent,
-  ],
+  exports: [],
   declarations: [
-    NavComponent,
-    FooterComponent,
-    Error404Component
+    Error404Component,
   ],
   providers: [
     AuthService,
     AdminGuard,
-    InventoryService
-  ]
+    InventoryService,
+  ],
 })
 
 export class CoreModule {

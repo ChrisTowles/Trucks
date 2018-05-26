@@ -31,7 +31,6 @@ import {MessagesComponent} from './pages/admin/messages/messages.component';
 import {UsersComponent} from './pages/admin/users/users.component';
 import {VinToolComponent} from './pages/admin/vin-tool/vin-tool.component';
 import {ContactComponent} from './pages/contact/contact.component';
-import {DirectionsComponent} from './pages/directions/directions.component';
 
 import {InventoryAddComponent} from './pages/inventory/inventory-add/inventory-add.component';
 import {InventoryDeleteComponent} from './pages/inventory/inventory-delete/inventory-delete.component';
@@ -43,7 +42,7 @@ import {InventoryListComponent} from './pages/inventory/inventory-list/inventory
 import {InventoryComponent} from './pages/inventory/inventory.component';
 
 import {MDBBootstrapModulesPro, MDBSpinningPreloader} from 'ng-uikit-pro-standard';
-
+import {AgmCoreModule} from '@agm/core';
 
 @NgModule({
   imports: [
@@ -63,10 +62,11 @@ import {MDBBootstrapModulesPro, MDBSpinningPreloader} from 'ng-uikit-pro-standar
     FileUploadModule,
     LocalStorageModule.withConfig({
       prefix: 'craigmyle-trucks',
-      storageType: 'localStorage'
+      storageType: 'localStorage',
     }),
     Angulartics2Module.forRoot([Angulartics2GoogleAnalytics]),
     MDBBootstrapModulesPro.forRoot(),
+    AgmCoreModule.forRoot({apiKey: 'AIzaSyATY3UAWjCc33LlP0hx2Jm5I-nSxj4_2M0'}),
   ],
   declarations: [
     AppComponent,
@@ -78,23 +78,22 @@ import {MDBBootstrapModulesPro, MDBSpinningPreloader} from 'ng-uikit-pro-standar
     InventoryEditComponent,
     InventoryEquipmentComponent,
     InventoryDeleteComponent,
-    DirectionsComponent,
     AdminComponent,
     EquipmentOptionsComponent,
     UsersComponent,
     MessagesComponent,
     VinToolComponent,
-    InventoryAddComponent
+    InventoryAddComponent,
   ],
   providers: [
-    MDBSpinningPreloader
+    MDBSpinningPreloader,
   ],
   entryComponents: [
     InventoryAddComponent,
-    InventoryDeleteComponent
+    InventoryDeleteComponent,
   ],
   bootstrap: [AppComponent],
-  schemas: [NO_ERRORS_SCHEMA]
+  schemas: [NO_ERRORS_SCHEMA],
 })
 
 export class AppModule {

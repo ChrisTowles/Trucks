@@ -13,8 +13,10 @@ import {InventoryDeleteComponent} from '../inventory-delete/inventory-delete.com
 @Component({
   selector: 'app-inventory-detail',
   templateUrl: './inventory-detail.component.html',
-  styleUrls: ['./inventory-detail.component.scss']
+  styleUrls: ['./inventory-detail.component.scss'],
 })
+
+
 export class InventoryDetailComponent implements OnInit {
 
   private itemDoc: AngularFirestoreDocument<Equipment>;
@@ -22,6 +24,55 @@ export class InventoryDetailComponent implements OnInit {
   item: EquipmentId;
   options: string[] = [];
   video_url: SafeResourceUrl;
+
+  imagesBasic = [
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(117).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(117).jpg',
+      description: 'Image 1',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(98).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(98).jpg',
+      description: 'Image 2',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(131).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(131).jpg',
+      description: 'Image 3',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(123).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(123).jpg',
+      description: 'Image 4',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(118).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(118).jpg',
+      description: 'Image 5',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(128).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(128).jpg',
+      description: 'Image 6',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(132).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(132).jpg',
+      description: 'Image 7',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(115).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(115).jpg',
+      description: 'Image 8',
+    },
+    {
+      img: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(133).jpg',
+      thumb: 'https://mdbootstrap.com/img/Photos/Horizontal/Nature/12-col/img%20(133).jpg',
+      description: 'Image 9',
+    },
+  ];
+
 
   galleryOptions: NgxGalleryOptions[] = [
     {
@@ -41,7 +92,7 @@ export class InventoryDetailComponent implements OnInit {
       thumbnailSize: NgxGalleryImageSize.Cover,
       thumbnailsRows: 3,
       thumbnailsSwipe: true,
-    }
+    },
   ];
   galleryImages: NgxGalleryImage[] = [];
 
@@ -95,7 +146,7 @@ export class InventoryDetailComponent implements OnInit {
 
           // Get Images
           this.imageCollection = this.afs.collection<EquipmentImage>(`inventory/${id}/images`, ref =>
-            ref.orderBy('order', 'asc')
+            ref.orderBy('order', 'asc'),
           );
           this.imageCollection.valueChanges()
             .subscribe(images => {
@@ -106,8 +157,10 @@ export class InventoryDetailComponent implements OnInit {
                     medium: this.cloudinary.url(img.public_id, {width: 512, crop: 'scale', fetch_format: 'auto'}),
                     big: this.cloudinary.url(img.public_id, {width: 1024, crop: 'scale', fetch_format: 'auto'}),
                     description: img.url,
-                    url: img.url
+                    url: img.url,
                   });
+
+
                 });
             });
         });
@@ -120,7 +173,7 @@ export class InventoryDetailComponent implements OnInit {
       {name: 'og:title', content: `Craigmyle Trucks - ${this.item.name}`},
       {name: 'og:description', content: this.item.name},
       {name: 'og:image', content: this.cloudinary.url(this.item.img_public_id, {width: 512, crop: 'scale', fetch_format: 'auto'})},
-      {name: 'og:type', content: 'website'}
+      {name: 'og:type', content: 'website'},
     ]);
     this.title.setTitle(`Craigmyle Trucks - ${this.item.name}`);
   }

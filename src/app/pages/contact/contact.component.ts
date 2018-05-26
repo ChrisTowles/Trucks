@@ -12,13 +12,18 @@ import {debounceTime, tap} from 'rxjs/operators';
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.scss']
+  styleUrls: ['./contact.component.scss'],
 })
 export class ContactComponent implements OnInit {
   contactForm: FormGroup;
 
   private _success = new Subject<string>();
   successMessage: string;
+
+  map = {
+    lat: 38.640642,
+    lng: -84.848373,
+  };
 
   constructor(private fb: FormBuilder,
               private afs: AngularFirestore,
@@ -33,7 +38,7 @@ export class ContactComponent implements OnInit {
       {name: 'description', content: 'Contact Us Page for Craigmyle Trucks'},
       {name: 'og:title', content: 'Craigmyle Trucks - Contact Us'},
       {name: 'og:description', content: 'We look forward to hearing from you!'},
-      {name: 'og:type', content: 'website'}
+      {name: 'og:type', content: 'website'},
     ]);
 
 
@@ -52,14 +57,14 @@ export class ContactComponent implements OnInit {
     this._success.pipe(
       tap((message) => this.successMessage = message),
       debounceTime(5000),
-      tap(() => this.successMessage = null)
+      tap(() => this.successMessage = null),
     );
 
     // Load values for form from storage so users can reuse it quickly
     this.contactForm.patchValue({
       firstName: this.localStorageService.get<string>('contact-firstName'),
       lastName: this.localStorageService.get<string>('contact-lastName'),
-      email: this.localStorageService.get<string>('contact-email')
+      email: this.localStorageService.get<string>('contact-email'),
     });
 
   }
@@ -70,7 +75,7 @@ export class ContactComponent implements OnInit {
       lastName: ['', Validators.required],
       email: ['', Validators.compose([Validators.email, Validators.required])],
       subject: ['', Validators.required],
-      message: ['']
+      message: [''],
     });
   }
 

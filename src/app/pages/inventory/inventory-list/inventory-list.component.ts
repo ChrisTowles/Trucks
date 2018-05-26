@@ -12,7 +12,7 @@ import {InventoryAddComponent} from '../inventory-add/inventory-add.component';
 import {InventoryDeleteComponent} from '../inventory-delete/inventory-delete.component';
 
 import {BehaviorSubject, combineLatest} from 'rxjs';
-import {map, take, tap} from 'rxjs/operators';
+import {map, take} from 'rxjs/operators';
 
 interface Category {
   name: string;
@@ -22,14 +22,13 @@ interface Category {
 @Component({
   selector: 'app-inventory-list',
   templateUrl: './inventory-list.component.html',
-  styleUrls: ['./inventory-list.component.scss']
+  styleUrls: ['./inventory-list.component.scss'],
 })
 export class InventoryListComponent {
 
   private inventoryCollection: AngularFirestoreCollection<Equipment>;
   inventory: EquipmentId[] = [];
   searchForm: FormGroup;
-  admin = false;
 
   categories: Category[] = [{name: 'All', count: 0}];
   category: Category = this.categories[0];
@@ -81,74 +80,19 @@ export class InventoryListComponent {
       });
 
     // Update Categories
-
-    this.authService.user.subscribe(
-      (user) => {
-
-        const equipment$ = this.afs.collection<Equipment>('inventory', ref => {
+    combineLatest(
+      this.searchFilter$,
+      this.statusFilter$,
+      this.authService.user,
+    ).subscribe(([search, status, user]) => {
+        this.afs.collection<Equipment>('inventory', ref => {
+          // Order by stockNumber
           let query = ref.orderBy('stockNumber', 'desc');
           // Filter by status based on admin
           if (!user || !user.admin) {
             query = query.where('status', '==', 1);
           }
-          // Order by stockNumber
-          return query;
-        }).valueChanges();
 
-        equipment$.subscribe((equip) => {
-
-          // Build object with category counts
-          const categories = equip.map(a => a.category);
-
-          const result = {};
-          for (let i = 0; i < categories.length; ++i) {
-            if (!result[categories[i]]) {
-              result[categories[i]] = 0;
-            }
-            ++result[categories[i]];
-          }
-
-          // Remove everything but All and update total
-          this.categories = this.categories.filter(a => a.name === 'All');
-          this.categories[0].count = equip.length;
-
-          // Add other categories with count
-          for (const x of Object.keys(result)) {
-            this.categories.push({name: x, count: result[x]});
-          }
-
-          // Set back to stored value if present
-          const name = this.localStorageService.get<string>('list-category') || 'All';
-          let index = this.categories.findIndex(a => a.name === name);
-          if (index < 0) {
-            index = 0;
-          }
-          this.category = this.categories[index];
-
-        });
-      }
-    );
-
-
-    // Update inventory
-    combineLatest(
-      this.searchFilter$,
-      this.authService.user,
-      this.categoryFilter$,
-      this.statusFilter$,
-      (search, user, category, status) => {
-        // Update admin
-        this.admin = user && user.admin;
-
-        // Get Inventory
-        this.inventoryCollection = this.afs.collection<Equipment>('inventory', ref => {
-          // Order by stockNumber
-          let query = ref.orderBy('stockNumber', 'desc');
-
-          // Filter by Category
-          if (category && category !== 'All') {
-            query = query.where('category', '==', category);
-          }
           // Filter by status based on admin
           if (!user || !user.admin) {
             query = query.where('status', '==', EquipmentStatus.Visible);
@@ -157,37 +101,101 @@ export class InventoryListComponent {
           }
 
           return query;
-        });
+        }).valueChanges()
+          .subscribe((equip) => {
+            // Build object with category counts
+            const categories = equip.map(a => a.category);
 
-        this.inventoryCollection.snapshotChanges()
-          .pipe(
-            map(actions => actions.map(a => {
-              const data = a.payload.doc.data() as Equipment;
-              const id = a.payload.doc.id;
-              return {id, ...data};
-            })),
-            map(equip => equip.filter(a => {
-              if (search !== '') {
-                return Object.keys(a).some(k => {
-                  if (typeof a[k] === 'string') {
-                    return a[k].toLowerCase().includes(search.toLowerCase());
-                  } else {
-                    return false;
-                  }
-                });
-              } else {
-                return true;
+            const result = {};
+            for (let i = 0; i < categories.length; ++i) {
+              if (!result[categories[i]]) {
+                result[categories[i]] = 0;
               }
-            })),
-            tap(equip => {
-              this.inventory = equip;
-            })
-          );
-      }
+              ++result[categories[i]];
+            }
+
+            // Remove everything but All and update total
+            this.categories = this.categories.filter(a => a.name === 'All');
+            this.categories[0].count = equip.length;
+
+            // Add other categories with count
+            for (const x of Object.keys(result)) {
+              this.categories.push({name: x, count: result[x]});
+            }
+
+            // Set back to stored value if present
+            const name = this.localStorageService.get<string>('list-category') || 'All';
+            let index = this.categories.findIndex(a => a.name === name);
+            if (index < 0) {
+              index = 0;
+            }
+            if (this.category !== this.categories[index]) {
+              this.setCategory(this.categories[index]);
+            }
+
+          });
+      },
     );
 
+
+    // Update inventory
+    combineLatest(
+      this.searchFilter$,
+      this.authService.user,
+      this.categoryFilter$,
+      this.statusFilter$)
+      .subscribe(
+        ([search, user, category, status]) => {
+
+          // Get Inventory
+          this.inventoryCollection = this.afs.collection<Equipment>('inventory', ref => {
+            // Order by stockNumber
+            let query = ref.orderBy('stockNumber', 'desc');
+
+            // Filter by Category
+            if (category && category !== 'All') {
+              query = query.where('category', '==', category);
+            }
+            // Filter by status based on admin
+            if (!user || !user.admin) {
+              query = query.where('status', '==', EquipmentStatus.Visible);
+            } else if (status != null) {
+              query = query.where('status', '==', status);
+            }
+
+            return query;
+          });
+
+          this.inventoryCollection.snapshotChanges()
+            .pipe(
+              map(actions => actions.map(a => {
+                const data = a.payload.doc.data() as Equipment;
+                const id = a.payload.doc.id;
+                return {id, ...data};
+              })),
+              map(equip => equip.filter(a => {
+                if (search !== '') {
+                  return Object.keys(a).some(k => {
+                    if (typeof a[k] === 'string') {
+                      return a[k].toLowerCase().includes(search.toLowerCase());
+                    } else {
+                      return false;
+                    }
+                  });
+                } else {
+                  return true;
+                }
+              })),
+            ).subscribe(equip => {
+
+            this.inventory = equip;
+
+          });
+        },
+      );
+
     this.meta.addTags([
-      {name: 'description', content: 'Inventory Page for Craigmyle Trucks'}
+      {name: 'description', content: 'Inventory Page for Craigmyle Trucks'},
     ]);
     this.title.setTitle('Craigmyle Trucks - Inventory');
   }
@@ -204,7 +212,7 @@ export class InventoryListComponent {
     const urlTree = this.router.createUrlTree([], {
       queryParams: {search: this.searchForm.value.searchText !== '' ? this.searchForm.value.searchText : null},
       queryParamsHandling: 'merge',
-      preserveFragment: true
+      preserveFragment: true,
     });
     this.router.navigateByUrl(urlTree);
   }
@@ -225,7 +233,7 @@ export class InventoryListComponent {
     const urlTree = this.router.createUrlTree([], {
       queryParams: {search: null},
       queryParamsHandling: 'merge',
-      preserveFragment: true
+      preserveFragment: true,
     });
     this.router.navigateByUrl(urlTree);
   }
@@ -239,7 +247,7 @@ export class InventoryListComponent {
         // Check if stockNumber is already in use
         this.afs.collection<Equipment>('inventory', ref => ref.where('stockNumber', '==', result.stockNumber))
           .snapshotChanges().pipe(
-          take(1)
+          take(1),
         )
           .subscribe(equipment => {
             if (equipment.length === 0) {
@@ -247,7 +255,7 @@ export class InventoryListComponent {
                 name: 'Unknown',
                 status: EquipmentStatus.Hidden,
                 stockNumber: result.stockNumber,
-                category: 'Truck'
+                category: 'Truck',
               } as Equipment;
 
               this.inventoryCollection.add(tmp)

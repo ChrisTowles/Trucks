@@ -9,7 +9,6 @@ import {MessagesComponent} from './pages/admin/messages/messages.component';
 import {UsersComponent} from './pages/admin/users/users.component';
 import {VinToolComponent} from './pages/admin/vin-tool/vin-tool.component';
 import {ContactComponent} from './pages/contact/contact.component';
-import {DirectionsComponent} from './pages/directions/directions.component';
 import {InventoryDetailComponent} from './pages/inventory/inventory-detail/inventory-detail.component';
 import {InventoryEditComponent} from './pages/inventory/inventory-edit/inventory-edit.component';
 import {InventoryEquipmentComponent} from './pages/inventory/inventory-equipment.component';
@@ -19,7 +18,7 @@ import {InventoryComponent} from './pages/inventory/inventory.component';
 const routes: Routes = [
   {
     path: '',
-    component: InventoryListComponent
+    component: InventoryListComponent,
   },
   {
     path: 'inventory',
@@ -32,13 +31,12 @@ const routes: Routes = [
         children: [
           {path: '', component: InventoryDetailComponent},
           {
-            path: 'edit', component: InventoryEditComponent, canActivate: [AdminGuard]
-          }
+            path: 'edit', component: InventoryEditComponent, canActivate: [AdminGuard],
+          },
         ],
-      }
+      },
     ],
   },
-  {path: 'directions', component: DirectionsComponent},
   {path: 'contact', component: ContactComponent},
   {path: 'about', component: AboutComponent},
   {
@@ -50,13 +48,13 @@ const routes: Routes = [
       {path: 'users', component: UsersComponent},
       {path: 'equipment-options', component: EquipmentOptionsComponent},
       {path: 'vin-tool', component: VinToolComponent},
-    ]
+    ],
   },
 
   {path: '404', component: Error404Component},
 
   // otherwise redirect to 404
-  {path: '**', redirectTo: '/404'}
+  {path: '**', redirectTo: '/404'},
 ];
 
 @NgModule({
@@ -64,8 +62,8 @@ const routes: Routes = [
     RouterModule.forRoot(routes) // For debugging add: {enableTracing: true}
   ],
   exports: [
-    RouterModule
-  ]
+    RouterModule,
+  ],
 })
 
 export class AppRoutingModule {

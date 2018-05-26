@@ -1,4 +1,4 @@
-<div class="container" *ngIf="item">
+<div class="container-fluid" *ngIf="item">
   <div class="row">
     <div class="col">
       <ol class="breadcrumb mt-2">
@@ -375,7 +375,7 @@
       <ng-template ngbTabContent>
         <div class="row mt-3">
           <div class="col-6 col-sm-4 col-md-3 mb-3"
-               *ngFor="let img of images$ | async as images; let i = index ">
+               *ngFor="let img of images; let i = index ">
             <div class="card"
                  [ngClass]="{
                  'border-primary': item.img_public_id === img.public_id,

@@ -5,7 +5,7 @@
 @import "~ngx-toastr/toastr-bs4-alert";
 
 $fa-font-path: '../node_modules/font-awesome/fonts';
-@import "~font-awesome/scss/font-awesome.scss";
+@import "~font-awesome/scss/font-awesome";
 
 .jumbotron {
   background-color: #0143A3;
@@ -22,8 +22,3 @@ $fa-font-path: '../node_modules/font-awesome/fonts';
     }
   }
 }
-
-body {
-  padding-top: 70px;
-}
-
