@@ -17,7 +17,6 @@ import {Angulartics2Module} from 'angulartics2';
 import {Angulartics2GoogleAnalytics} from 'angulartics2/ga';
 import {Cloudinary} from 'cloudinary-core';
 import {FileUploadModule} from 'ng2-file-upload';
-import {NgxGalleryModule} from 'ngx-gallery';
 import {ToastrModule} from 'ngx-toastr';
 
 import {AppRoutingModule} from './app-routing.module';
@@ -56,7 +55,6 @@ import {AgmCoreModule} from '@agm/core';
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features
     NgbModule.forRoot(),
     CoreModule,
-    NgxGalleryModule,
     CloudinaryModule.forRoot({Cloudinary}, environment.cloudinary as CloudinaryConfiguration),
     ToastrModule.forRoot(),
     FileUploadModule,

@@ -3,7 +3,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {NgModule, Optional, SkipSelf} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
-import {NgbCollapseModule, NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
+
 import {AdminGuard} from './admin.guard';
 import {AuthService} from './auth.service';
 import {Error404Component} from './error404/error-404.component';
@@ -19,8 +19,6 @@ import {throwIfAlreadyLoaded} from './module-import-guard';
     FormsModule,
     RouterModule,
     ReactiveFormsModule,
-    NgbDropdownModule,
-    NgbCollapseModule,
     HttpClientModule,
     MDBBootstrapModulesPro,
   ],
