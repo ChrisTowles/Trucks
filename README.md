@@ -1,3 +1,9 @@
+This is a fork to keep a copy after upgrading to Angular 6 with Mdbootstrap
+
+Mdbootstrap has alot of errors in it, checkboxes dont work, no error handling on forms, lightbox doesnt work well, issues with sidenav, and most of all errors when viewing on apple devices and IE.  
+
+I am reverting the main repo, but wanted a copy of all the upgrades to angular 6.
+
 # Trucks
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.5.5.
