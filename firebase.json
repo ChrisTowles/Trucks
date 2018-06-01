@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist",
+    "public": "functions/dist/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -41,8 +41,9 @@
   },
   "functions": {
     "predeploy": [
-      "npm --prefix functions run lint",
-      "npm --prefix functions run build"
-    ]
+      "npm --prefix \"$RESOURCE_DIR\" run lint",
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ],
+    "source": "functions"
   }
 }

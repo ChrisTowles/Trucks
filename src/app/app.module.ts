@@ -8,7 +8,6 @@ import {CoreModule} from '@app/core';
 import {CloudinaryConfiguration, CloudinaryModule} from '@cloudinary/angular-5.x';
 
 import {environment} from '@env/environment';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {LocalStorageModule} from 'angular-2-local-storage';
 import {AngularFireModule} from 'angularfire2';
 import {AngularFireAuthModule} from 'angularfire2/auth';
@@ -17,7 +16,6 @@ import {Angulartics2Module} from 'angulartics2';
 import {Angulartics2GoogleAnalytics} from 'angulartics2/ga';
 import {Cloudinary} from 'cloudinary-core';
 import {FileUploadModule} from 'ng2-file-upload';
-import {ToastrModule} from 'ngx-toastr';
 
 import {AppRoutingModule} from './app-routing.module';
 
@@ -31,8 +29,6 @@ import {UsersComponent} from './pages/admin/users/users.component';
 import {VinToolComponent} from './pages/admin/vin-tool/vin-tool.component';
 import {ContactComponent} from './pages/contact/contact.component';
 
-import {InventoryAddComponent} from './pages/inventory/inventory-add/inventory-add.component';
-import {InventoryDeleteComponent} from './pages/inventory/inventory-delete/inventory-delete.component';
 import {InventoryDetailComponent} from './pages/inventory/inventory-detail/inventory-detail.component';
 import {InventoryEditComponent} from './pages/inventory/inventory-edit/inventory-edit.component';
 import {InventoryEquipmentComponent} from './pages/inventory/inventory-equipment.component';
@@ -40,12 +36,14 @@ import {InventoryListComponent} from './pages/inventory/inventory-list/inventory
 
 import {InventoryComponent} from './pages/inventory/inventory.component';
 
-import {MDBBootstrapModulesPro, MDBSpinningPreloader} from 'ng-uikit-pro-standard';
+import {MDBBootstrapModulesPro, MDBSpinningPreloader, ToastModule} from 'ng-uikit-pro-standard';
 import {AgmCoreModule} from '@agm/core';
+import {WINDOW_PROVIDERS} from '@app/core/window.service';
+
 
 @NgModule({
   imports: [
-    BrowserModule.withServerTransition({appId: 'app-root'}),
+    BrowserModule.withServerTransition({appId: 'trucks'}),
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
@@ -53,10 +51,9 @@ import {AgmCoreModule} from '@agm/core';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features
-    NgbModule.forRoot(),
     CoreModule,
     CloudinaryModule.forRoot({Cloudinary}, environment.cloudinary as CloudinaryConfiguration),
-    ToastrModule.forRoot(),
+    ToastModule.forRoot(),
     FileUploadModule,
     LocalStorageModule.withConfig({
       prefix: 'craigmyle-trucks',
@@ -75,21 +72,17 @@ import {AgmCoreModule} from '@agm/core';
     InventoryDetailComponent,
     InventoryEditComponent,
     InventoryEquipmentComponent,
-    InventoryDeleteComponent,
     AdminComponent,
     EquipmentOptionsComponent,
     UsersComponent,
     MessagesComponent,
     VinToolComponent,
-    InventoryAddComponent,
   ],
   providers: [
     MDBSpinningPreloader,
+    WINDOW_PROVIDERS,
   ],
-  entryComponents: [
-    InventoryAddComponent,
-    InventoryDeleteComponent,
-  ],
+  entryComponents: [],
   bootstrap: [AppComponent],
   schemas: [NO_ERRORS_SCHEMA],
 })

@@ -27,10 +27,9 @@ appSiteMap.all('*', (req, res) => {
         urls: [
             { url: '/', changefreq: 'monthly', priority: 0.5 },
             { url: '/inventory/', changefreq: 'daily', priority: 1 },
-            { url: '/directions', changefreq: 'monthly', priority: 0.3 },
             { url: '/about', changefreq: 'monthly', priority: 0.3 },
             { url: '/contact', changefreq: 'monthly', priority: 0.3 },
-        ]
+        ],
     });
     afs.collection('inventory')
         .where('status', '==', model_1.EquipmentStatus.Visible)
@@ -40,7 +39,7 @@ appSiteMap.all('*', (req, res) => {
             map.add({
                 url: '/inventory/' + getEquipmentUrl(i.data()),
                 changefreq: 'daily',
-                priority: 0.5
+                priority: 0.5,
             });
         });
         res.send(map.toString());

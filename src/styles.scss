@@ -1,24 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~bootswatch/dist/flatly/variables";
-@import "~bootstrap/scss/bootstrap";
-@import "~bootswatch/dist/flatly/bootswatch";
-@import "~ngx-toastr/toastr-bs4-alert";
 
-$fa-font-path: '../node_modules/font-awesome/fonts';
-@import "~font-awesome/scss/font-awesome";
-
-.jumbotron {
-  background-color: #0143A3;
-  background: linear-gradient(135deg, #0143A3, #0273D4);
-  border-radius: 0px;
-  color: #fff;
-
-  .btn {
-    color: #fff;
-    border-color: #fff;
-    &:hover {
-      background-color: #f7f7f7;
-      color: #0273D4;
-    }
+// Fix for lightbox when used with fixed-top
+mdb-image-modal {
+  .top-bar {
+    margin-top: 60px;
+  }
+  .ng-gallery-content {
+    margin-top: 60px;
   }
 }

@@ -7,6 +7,7 @@ const sitemap_1 = require("./sitemap");
 exports.sitemap = functions.https.onRequest(sitemap_1.siteMapApp);
 exports.ctt = functions.https.onRequest(commercial_truck_trader_1.commercialTruckTraderApp);
 exports.sendMessageCreateEmail = functions.firestore.document('messages/{messageId}').onCreate(messages_1.messageCreateApp);
+//export const ssr = functions.https.onRequest(serverSideRendering);
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //

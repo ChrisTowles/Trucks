@@ -2,12 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {InventoryService} from '@app/core';
 import {EquipmentOption, EquipmentOptionId} from '@app/shared';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {ToastrService} from 'ngx-toastr';
+import {ToastService} from 'ng-uikit-pro-standard';
 
 @Component({
   selector: 'app-equipment-options',
   templateUrl: './equipment-options.component.html',
-  styleUrls: ['./equipment-options.component.scss']
+  styleUrls: ['./equipment-options.component.scss'],
 })
 export class EquipmentOptionsComponent implements OnInit {
   private equipmentOptionsCollection: AngularFirestoreCollection<EquipmentOption>;
@@ -16,7 +16,7 @@ export class EquipmentOptionsComponent implements OnInit {
 
   constructor(private afs: AngularFirestore,
               private inventoryService: InventoryService,
-              private toastr: ToastrService) {
+              private toast: ToastService) {
   }
 
   ngOnInit() {
@@ -35,9 +35,9 @@ export class EquipmentOptionsComponent implements OnInit {
     this.equipmentOptionsCollection.add({name: name})
       .then(value => {
         this.addText = '';
-        this.toastr.success(`Added ${name}`, 'Success');
+        this.toast.success(`Added ${name}`, 'Success');
       }, reason => {
-        this.toastr.error(`Error adding ${name}, ${reason.toString()}`, 'Error');
+        this.toast.error(`Error adding ${name}, ${reason.toString()}`, 'Error');
       });
   }
 
@@ -45,9 +45,9 @@ export class EquipmentOptionsComponent implements OnInit {
     this.equipmentOptionsCollection.doc(option.id)
       .delete()
       .then(value => {
-        this.toastr.success(`Deleted ${option.name}`, 'Success');
+        this.toast.success(`Deleted ${option.name}`, 'Success');
       }, reason => {
-        this.toastr.error(`Error deleting ${option.name}, ${reason.toString()}`, 'Error');
+        this.toast.error(`Error deleting ${option.name}, ${reason.toString()}`, 'Error');
       });
   }
 }

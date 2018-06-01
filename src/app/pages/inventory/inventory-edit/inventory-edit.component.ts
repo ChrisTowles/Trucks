@@ -7,9 +7,8 @@ import {Equipment, EquipmentId, EquipmentImage, EquipmentImageId, EquipmentOptio
 import {Cloudinary} from '@cloudinary/angular-5.x';
 import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument} from 'angularfire2/firestore';
 import {FileUploader, FileUploaderOptions, ParsedResponseHeaders} from 'ng2-file-upload';
-import {ToastrService} from 'ngx-toastr';
-import {Observable} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, take} from 'rxjs/operators';
+import {map, take} from 'rxjs/operators';
+import {ToastService} from 'ng-uikit-pro-standard';
 
 
 @Component({
@@ -29,7 +28,7 @@ export class InventoryEditComponent implements OnInit {
   imageOrderMax = 0;
   itemForm: FormGroup;
   responses: Array<any>;
-
+  test: boolean = false;
   formOptions = {
     years: [],
     options: [],
@@ -173,25 +172,48 @@ export class InventoryEditComponent implements OnInit {
       'Man-8Spd',
       'Man-9Spd',
     ],
+    status: [
+      {value: 0, label: 'Hidden'},
+      {value: 1, label: 'Visible'},
+      {value: 2, label: 'Archived'},
+    ],
+    fuelType: [
+      {value: 'Diesel', label: 'Diesel'},
+      {value: 'Gasoline', label: 'Gasoline'},
+    ],
+    brakeType: [
+      {value: 'Hydraulic', label: 'Hydraulic'},
+      {value: 'Air', label: 'Air'},
+      {value: 'Electric', label: 'Electric'},
+      {value: 'Other', label: 'Other'},
+    ],
   };
 
   public uploader: FileUploader;
+
 
   constructor(private afs: AngularFirestore,
               private fb: FormBuilder,
               private router: Router,
               private activatedRoute: ActivatedRoute,
-              private inventoryService: InventoryService,
+              public inventoryService: InventoryService,
               private cloudinary: Cloudinary,
               private http: HttpClient,
-              private toastr: ToastrService) {
+              private toast: ToastService) {
 
     this.responses = [];
     this.createForm();
+
   }
 
   createForm() {
-    this.formOptions.years = this.range(1960, (new Date()).getFullYear(), 1).reverse();
+    this.formOptions.years = this.range(1960, (new Date()).getFullYear(), 1).reverse()
+      .map(v => {
+        return {
+          value: v,
+          label: v.toString(),
+        };
+      });
     this.itemForm = this.fb.group({ // <-- the parent FormGroup
       name: ['', [Validators.required, Validators.pattern('[A-Za-z0-9 -]+')]],
       vin: '',
@@ -252,11 +274,17 @@ export class InventoryEditComponent implements OnInit {
         .subscribe((equip) => {
           // Set item
           this.item = equip;
+
+          this.setupUploader();
           this.itemForm.patchValue(this.item);
+
           this.itemDoc = this.afs.doc<Equipment>(`inventory/${this.item.id}`);
 
           // get options
-          const currentOptions = this.afs.collection<EquipmentOption>(`inventory/${this.item.id}/options`)
+          this.itemOptionsCollection = this.afs.collection<EquipmentOption>(`inventory/${this.item.id}/options`);
+
+
+          this.itemOptionsCollection
             .snapshotChanges()
             .subscribe(options => {
               this.inventoryService.equipmentOptions.forEach(o => {
@@ -285,9 +313,11 @@ export class InventoryEditComponent implements OnInit {
             });
 
           // get images
-          this.afs.collection<EquipmentImage>(`inventory/${this.item.id}/images`, ref =>
+          this.imageCollection = this.afs.collection<EquipmentImage>(`inventory/${this.item.id}/images`, ref =>
             ref.orderBy('order', 'asc'),
-          )
+          );
+
+          this.imageCollection
             .snapshotChanges()
             .subscribe(images => {
 
@@ -309,7 +339,7 @@ export class InventoryEditComponent implements OnInit {
                 }
               }
 
-              this.setupUploader();
+
             });
         });
     });
@@ -382,11 +412,11 @@ export class InventoryEditComponent implements OnInit {
   save() {
     this.itemDoc.update(this.itemForm.value)
       .then(value => {
-        this.toastr.success(`Saved ${this.item.name}`, 'Success');
+        this.toast.success(`Saved ${this.item.name}`, 'Success');
         // this.router.navigate(['../../'], {relativeTo: this.activatedRoute});
       })
       .catch(reason => {
-        this.toastr.error(`${reason.toString()}`, 'Failed');
+        this.toast.error(`${reason.toString()}`, 'Failed');
         console.error(reason);
       });
   }
@@ -448,8 +478,6 @@ export class InventoryEditComponent implements OnInit {
             .forEach((key) => (newData[key] == null || newData[key] === '') && delete newData[key]);
           this.itemForm.patchValue(newData);
         }
-
-
       });
   }
 
@@ -475,27 +503,4 @@ export class InventoryEditComponent implements OnInit {
     }
   }
 
-
-  searchTransmissionManufacturer = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => term === '' ? this.formOptions.transmissionManufacturers :
-        this.formOptions.transmissionManufacturers.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10)),
-    );
-
-  searchTransmission = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => term === '' ? this.formOptions.transmissionManufacturers :
-      this.formOptions.transmission.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10)),
-  );
-
-  searchCategory = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => term === '' ? this.formOptions.categories :
-        this.formOptions.categories.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10)),
-    );
 }

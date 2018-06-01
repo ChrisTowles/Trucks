@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {ToastrService} from 'ngx-toastr';
+import {ToastService} from 'ng-uikit-pro-standard';
 import deleteProperty = Reflect.deleteProperty;
 
 @Component({
   selector: 'app-vin-tool',
   templateUrl: './vin-tool.component.html',
-  styleUrls: ['./vin-tool.component.scss']
+  styleUrls: ['./vin-tool.component.scss'],
 })
 export class VinToolComponent implements OnInit {
 
@@ -14,7 +14,7 @@ export class VinToolComponent implements OnInit {
   data: any;
 
   constructor(private http: HttpClient,
-              private toastr: ToastrService) {
+              private toast: ToastService) {
   }
 
   ngOnInit() {
@@ -36,7 +36,7 @@ export class VinToolComponent implements OnInit {
           }
 
         } else {
-          this.toastr.error('Error Finding vin information', 'Failed');
+          this.toast.error('Error Finding vin information', 'Failed');
           this.data = data;
         }
 

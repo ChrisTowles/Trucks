@@ -1,18 +1,15 @@
-import {Component} from '@angular/core';
+import {Component, ElementRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Meta, Title} from '@angular/platform-browser';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AuthService, InventoryService} from '@app/core';
 import {Equipment, EquipmentId, EquipmentStatus} from '@app/shared';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {LocalStorageService} from 'angular-2-local-storage';
 import {AngularFirestore, AngularFirestoreCollection} from 'angularfire2/firestore';
-import {ToastrService} from 'ngx-toastr';
-import {InventoryAddComponent} from '../inventory-add/inventory-add.component';
-import {InventoryDeleteComponent} from '../inventory-delete/inventory-delete.component';
 
 import {BehaviorSubject, combineLatest} from 'rxjs';
 import {map, take} from 'rxjs/operators';
+import {ToastService} from 'ng-uikit-pro-standard';
 
 interface Category {
   name: string;
@@ -42,14 +39,17 @@ export class InventoryListComponent {
 
   searchFilter$: BehaviorSubject<string | null>;
 
+  @ViewChild('stockNumber') vc: ElementRef;
+  addForm: FormGroup;
+
+
   constructor(private afs: AngularFirestore,
-              private modalService: NgbModal,
               private router: Router,
               private activatedRoute: ActivatedRoute,
               private fb: FormBuilder,
               public inventoryService: InventoryService,
               public authService: AuthService,
-              private toastr: ToastrService,
+              private toast: ToastService,
               private localStorageService: LocalStorageService,
               private meta: Meta,
               private title: Title) {
@@ -194,6 +194,11 @@ export class InventoryListComponent {
         },
       );
 
+
+    this.addForm = this.fb.group({ // <-- the parent FormGroup
+      stockNumber: ['', [Validators.required, Validators.pattern('[0-9]*')]],
+    });
+
     this.meta.addTags([
       {name: 'description', content: 'Inventory Page for Craigmyle Trucks'},
     ]);
@@ -238,70 +243,59 @@ export class InventoryListComponent {
     this.router.navigateByUrl(urlTree);
   }
 
-  add() {
+  add(data) {
+    // Check if stockNumber is already in use
+    this.afs.collection<Equipment>('inventory', ref => ref.where('stockNumber', '==', data.stockNumber))
+      .snapshotChanges().pipe(
+      take(1),
+    )
+      .subscribe(equipment => {
+        if (equipment.length === 0) {
+          const tmp = {
+            name: 'Unknown',
+            status: EquipmentStatus.Hidden,
+            stockNumber: data.stockNumber,
+            category: 'Truck',
+          } as Equipment;
 
-    const modalRef = this.modalService.open(InventoryAddComponent);
+          this.inventoryCollection.add(tmp)
+            .then(value => {
 
-    modalRef.result.then((result) => {
-      if (result.stockNumber) {
-        // Check if stockNumber is already in use
-        this.afs.collection<Equipment>('inventory', ref => ref.where('stockNumber', '==', result.stockNumber))
-          .snapshotChanges().pipe(
-          take(1),
-        )
-          .subscribe(equipment => {
-            if (equipment.length === 0) {
-              const tmp = {
-                name: 'Unknown',
-                status: EquipmentStatus.Hidden,
-                stockNumber: result.stockNumber,
-                category: 'Truck',
-              } as Equipment;
+              this.router.navigate(['inventory', this.inventoryService.getUrl(tmp), 'edit']);
+              this.toast.success(`Added Stock # ${data.stockNumber}`, 'Success');
+            })
+            .catch(reason => {
+              this.toast.error(`${reason.toString()}`, 'Failed');
+              console.error(reason);
+            });
 
-              this.inventoryCollection.add(tmp)
-                .then(value => {
-
-                  this.router.navigate(['inventory', this.inventoryService.getUrl(tmp), 'edit']);
-                  this.toastr.success(`Added Stock # ${result.stockNumber}`, 'Success');
-                })
-                .catch(reason => {
-                  this.toastr.error(`${reason.toString()}`, 'Failed');
-                  console.error(reason);
-                });
-
-            } else {
-              this.toastr.error(`Stock Number is already in use!`, 'Failed');
-            }
+        } else {
+          this.toast.error(`Stock Number is already in use!`, 'Failed');
+        }
 
 
-          });
-
-
-      }
-    });
-
-
+      });
   }
 
   delete(item: EquipmentId) {
 
     const name = item.name;
-    const modalRef = this.modalService.open(InventoryDeleteComponent);
-    modalRef.componentInstance.name = name;
-
-    modalRef.result.then((result) => {
-      if (result === 'delete') {
-        this.inventoryCollection.doc(item.id)
-          .delete()
-          .then(() => {
-            this.toastr.success(`Deleted ${name}`, 'Success');
-          })
-          .catch(reason => {
-            this.toastr.error(`${reason.toString()}`, 'Failed');
-            console.error(reason);
-          });
-      }
-    });
+    // const modalRef = this.modalService.open(InventoryDeleteComponent);
+    // modalRef.componentInstance.name = name;
+    //
+    // modalRef.result.then((result) => {
+    //   if (result === 'delete') {
+    //     this.inventoryCollection.doc(item.id)
+    //       .delete()
+    //       .then(() => {
+    //         this.toast.success(`Deleted ${name}`, 'Success');
+    //       })
+    //       .catch(reason => {
+    //         this.toast.error(`${reason.toString()}`, 'Failed');
+    //         console.error(reason);
+    //       });
+    //   }
+    // });
 
   }
 
@@ -310,10 +304,10 @@ export class InventoryListComponent {
     const itemDoc = this.afs.doc<Equipment>(`inventory/${item.id}`);
     itemDoc.update({commercialTruckTrader: item.commercialTruckTrader})
       .then(value => {
-        this.toastr.success(`Saved ${item.name}`, 'Success');
+        this.toast.success(`Saved ${item.name}`, 'Success');
       })
       .catch(reason => {
-        this.toastr.error(`${reason.toString()}`, 'Failed');
+        this.toast.error(`${reason.toString()}`, 'Failed');
         console.error(reason);
       });
   }

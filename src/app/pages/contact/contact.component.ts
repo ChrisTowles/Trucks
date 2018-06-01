@@ -4,10 +4,10 @@ import {Meta, Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {LocalStorageService} from 'angular-2-local-storage';
 import {AngularFirestore} from 'angularfire2/firestore';
-import {ToastrService} from 'ngx-toastr';
-
 import {Subject} from 'rxjs';
 import {debounceTime, tap} from 'rxjs/operators';
+import {ToastService} from 'ng-uikit-pro-standard';
+
 
 @Component({
   selector: 'app-contact',
@@ -29,7 +29,7 @@ export class ContactComponent implements OnInit {
               private afs: AngularFirestore,
               private localStorageService: LocalStorageService,
               private activatedRoute: ActivatedRoute,
-              private toastr: ToastrService,
+              private toast: ToastService,
               private meta: Meta,
               private title: Title) {
 
@@ -89,7 +89,7 @@ export class ContactComponent implements OnInit {
       this.localStorageService.set('contact-lastName', data.lastName);
       this.localStorageService.set('contact-email', data.email);
       this.contactForm.reset({firstName: data.firstName, lastName: data.lastName, email: data.email});
-      this.toastr.success(`Thanks for sending us a messages.`, 'Success');
+      this.toast.success(`Thanks for sending us a messages.`, 'Success');
     });
 
   }

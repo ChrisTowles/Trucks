@@ -2,7 +2,7 @@
 <header>
 
   <!-- Sidebar navigation -->
-  <mdb-sidenav #sidenav class="sn-bg-1 fixed" [fixed]="true">
+  <mdb-sidenav #sidenav class="sn-bg-1 fixed" [fixed]="false">
 
     <div class="p-2 text-center">
       <h4>Craigmyle Trucks</h4>
@@ -21,37 +21,39 @@
     <!--</logo>-->
 
     <links>
-      <!--&lt;!&ndash;Social&ndash;&gt;-->
-      <!--<li>-->
-      <!--<ul class="social">-->
-      <!--<li><a class="icons-sm fb-ic"><i class="fa fa-facebook"> </i></a></li>-->
-      <!--<li><a class="icons-sm pin-ic"><i class="fa fa-pinterest"> </i></a></li>-->
-      <!--<li><a class="icons-sm gplus-ic"><i class="fa fa-google-plus"> </i></a></li>-->
-      <!--<li><a class="icons-sm tw-ic"><i class="fa fa-twitter"> </i></a></li>-->
-      <!--</ul>-->
-      <!--</li>-->
-      <!--/Social-->
+      <!--Social-->
+      <li>
+        <ul class="social">
+          <li><a class="icons-sm fb-ic"
+                 href="https://www.facebook.com/Craigmyle-Truck-and-Trailer-Sales-117298808998025/"><i
+            class="fa fa-facebook"> </i></a></li>
+
+          <!--<li><a class="icons-sm pin-ic"><i class="fa fa-pinterest"> </i></a></li>-->
+          <!--<li><a class="icons-sm gplus-ic"><i class="fa fa-google-plus"> </i></a></li>-->
+          <!--<li><a class="icons-sm tw-ic"><i class="fa fa-twitter"> </i></a></li>-->
+        </ul>
+      </li>
 
       <!--Search Form-->
-      <li>
-        <!--<form class="search-form" role="search" novalidate [formGroup]="searchForm">-->
-        <!--<div class="form-group md-form mt-0 pt-1 waves-light" mdbWavesEffect>-->
-        <!--<input class="form-control" type="search" formControlName="searchText" placeholder="Search"-->
-        <!--aria-label="Search">-->
-        <!--<div class="input-group-append">-->
-        <!--<button class="btn btn-secondary" [disabled]="searchForm.invalid" (click)="search()">-->
-        <!--<i class="fa fa-search" aria-hidden="true"></i>-->
-        <!--</button>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</form>-->
+      <!--<li>-->
+      <!--&lt;!&ndash;<form class="search-form" role="search" novalidate [formGroup]="searchForm">&ndash;&gt;-->
+      <!--&lt;!&ndash;<div class="form-group md-form mt-0 pt-1 waves-light" mdbWavesEffect>&ndash;&gt;-->
+      <!--&lt;!&ndash;<input class="form-control" type="search" formControlName="searchText" placeholder="Search"&ndash;&gt;-->
+      <!--&lt;!&ndash;aria-label="Search">&ndash;&gt;-->
+      <!--&lt;!&ndash;<div class="input-group-append">&ndash;&gt;-->
+      <!--&lt;!&ndash;<button class="btn btn-secondary" [disabled]="searchForm.invalid" (click)="search()">&ndash;&gt;-->
+      <!--&lt;!&ndash;<i class="fa fa-search" aria-hidden="true"></i>&ndash;&gt;-->
+      <!--&lt;!&ndash;</button>&ndash;&gt;-->
+      <!--&lt;!&ndash;</div>&ndash;&gt;-->
+      <!--&lt;!&ndash;</div>&ndash;&gt;-->
+      <!--&lt;!&ndash;</form>&ndash;&gt;-->
 
-        <form class="search-form" role="search">
-          <div class="form-group md-form mt-0 pt-1 waves-light" mdbWavesEffect>
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-        </form>
-      </li>
+      <!--<form class="search-form" role="search">-->
+      <!--<div class="form-group md-form mt-0 pt-1 waves-light" mdbWavesEffect>-->
+      <!--<input type="text" class="form-control" placeholder="Search">-->
+      <!--</div>-->
+      <!--</form>-->
+      <!--</li>-->
       <!--/.Search Form-->
       <!-- Side navigation links -->
       <li>
@@ -60,38 +62,36 @@
 
 
             <!-- Contact -->
-            <mdb-item class="no-collase" [routerLink]="['/']">
+            <mdb-item [collapsed]="false">
               <mdb-item-head mdbWavesEffect><i class="fa fa-home"></i>
-                Inventory
+                Pages
               </mdb-item-head>
-              <mdb-item-body></mdb-item-body>
-            </mdb-item>
-
-            <!-- Contact -->
-            <mdb-item class="no-collase" [routerLink]="['/contact']">
-              <mdb-item-head mdbWavesEffect><i class="fa fa-envelope-o"></i>
-                Contact
-              </mdb-item-head>
-              <mdb-item-body></mdb-item-body>
-            </mdb-item>
-
-            <!-- About -->
-            <mdb-item class="no-collase" [routerLink]="['/about']">
-              <mdb-item-head mdbWavesEffect><i class="fa fa-info-circle"></i>
-                About Us
-              </mdb-item-head>
-              <mdb-item-body></mdb-item-body>
+              <mdb-item-body>
+                <ul>
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/']"
+                         (click)="sidenav.toggle()">Inventory</a></li>
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/contact']" (click)="sidenav.toggle()">Contact</a>
+                  </li>
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/about']"
+                         (click)="sidenav.toggle()">About</a></li>
+                </ul>
+              </mdb-item-body>
             </mdb-item>
 
             <!-- Admin -->
-            <mdb-item *ngIf="authService.isAdmin">
+            <mdb-item *ngIf="authService.isAdmin | async" [collapsed]="false">
               <mdb-item-head mdbWavesEffect><i class="fa fa-chevron-right"></i> Admin</mdb-item-head>
               <mdb-item-body>
                 <ul>
-                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/vin-tool']">Vin Tool</a></li>
-                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/users']">Users</a></li>
-                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/messages']">Messages</a></li>
-                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/equipment-options']">Equipment
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/vin-tool']"
+                         (click)="sidenav.toggle()">Vin
+                    Tool</a></li>
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/users']" (click)="sidenav.toggle()">Users</a>
+                  </li>
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/messages']"
+                         (click)="sidenav.toggle()">Messages</a></li>
+                  <li><a class="waves-effect" mdbWavesEffect [routerLink]="['/admin/equipment-options']"
+                         (click)="sidenav.toggle()">Equipment
                     Options</a></li>
                 </ul>
               </mdb-item-body>
@@ -125,7 +125,6 @@
       </div>
       <!--/. Breadcrumb-->
     </logo>
-
 
     <navlinks>
 

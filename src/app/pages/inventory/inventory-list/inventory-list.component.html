@@ -2,6 +2,7 @@
   <img class="card-img-top" src="assets/img/no-image.svg" alt="No Image">
 </ng-template>
 <div class="container-fluid">
+
   <div class="row pb-2">
     <div class="col-12 col-md-6">
       <form novalidate [formGroup]="searchForm">
@@ -38,20 +39,15 @@
             </button>
           </div>
         </div>
-        <button type="button" class="btn btn-primary btn-sm waves-light" mdbWavesEffect
-                *ngIf="authService.isAdmin | async"
-                (click)="add()">
-          <i class="fa fa-plus"></i> Add
-        </button>
       </div>
     </div>
   </div>
   <div class="row" *ngIf="inventory.length != 0">
-    <div class="col-lg-4 col-md-6 col-12 mb-3 board-"
+    <div class="col-lg-4 col-md-6 col-12 mb-5"
          *ngFor="let item of inventory; let i = index ">
       <div class="card card-cascade h-100" [ngClass]="{
       'border-danger': item.status == 0,
-      'border-primary': item.status == 1,
+      '': item.status == 1,
       'border-warning': item.status == 2
       }">
         <div class="view overlay hm-white-slight waves-light" mdbWavesEffect>
@@ -67,44 +63,50 @@
           </a>
         </div>
 
+        <a class="btn-floating btn-action ml-auto mr-4 mdb-color lighten-3 waves-light" mdbWavesEffect
+           [routerLink]="['inventory', inventoryService.getUrl(item)]">
+          <i class="fa fa-chevron-right pl-1 waves-light" mdbWavesEffect></i>
+        </a>
         <div class="card-body">
-          <a [routerLink]="['inventory', inventoryService.getUrl(item)]">
-            <h4 class="card-title text-center">{{ item.name }}</h4>
-          </a>
+          <h4 class="h4-responsive card-title">{{ item.name }}</h4>
+          <h6 class="h6-responsive">{{ item.category }}</h6>
+          <hr>
           <div *ngIf="item.year">
-            <span class="text-secondary">Year</span>
-            <span class="pull-right text-overflow">{{item.year}}</span>
+            <span class="text-muted">Year</span>
+            <span class="font-weight-bold pull-right text-overflow">{{item.year}}</span>
           </div>
           <div *ngIf="item.make">
-            <span class="text-secondary">Make</span>
-            <span class="pull-right text-overflow">{{item.make}}</span>
+            <span class="text-muted">Make</span>
+            <span class="font-weight-bold pull-right text-overflow">{{item.make}}</span>
           </div>
           <div *ngIf="item.model">
-            <span class="text-secondary">Model</span>
-            <span class="pull-right text-overflow">{{item.model}}</span>
+            <span class="text-muted">Model</span>
+            <span class="font-weight-bold pull-right text-overflow">{{item.model}}</span>
           </div>
           <div *ngIf="item.engineManufacturer || item.engineModel">
-            <span class="text-secondary">Engine</span>
-            <span class="pull-right text-overflow">
+            <span class="text-muted">Engine</span>
+            <span class="font-weight-bold pull-right text-overflow">
               {{inventoryService.getEngineName(item)}}
             </span>
           </div>
           <div *ngIf="item.transmission || item.transmissionManufacturer">
-            <span class="text-secondary">Transmission</span>
-            <span
-              class="pull-right text-overflow">{{ [item.transmissionManufacturer, item.transmission].join(' ') }}</span>
+            <span class="text-muted">Transmission</span>
+            <span class="font-weight-bold pull-right text-overflow">
+              {{ [item.transmissionManufacturer, item.transmission].join(' ') }}
+            </span>
           </div>
           <div *ngIf="item.suspension">
-            <span class="text-secondary">Suspension</span>
-            <span class="pull-right text-overflow">{{item.suspension}}</span>
+            <span class="text-muted">Suspension</span>
+            <span class="font-weight-bold pull-right text-overflow">{{item.suspension}}</span>
           </div>
           <div *ngIf="item.odometer">
-            <span class="text-secondary">Mileage</span>
-            <span class="pull-right text-overflow">{{item.odometer | number }}</span>
+            <span class="text-muted">Mileage</span>
+            <span class="font-weight-bold pull-right text-overflow">{{item.odometer | number }}</span>
           </div>
           <div *ngIf="item.price">
-            <span class="text-secondary">Price</span>
-            <span class="pull-right text-overflow">{{item.price | currency:'USD':'symbol':'1.0-2' }}</span>
+            <span class="text-muted">Price</span>
+            <span
+              class="font-weight-bold pull-right text-overflow">{{item.price | currency:'USD':'symbol':'1.0-2' }}</span>
           </div>
 
 
@@ -116,24 +118,18 @@
               Delete
             </button>
           </div>
-          -
         </div>
-        <div class="mdb-color lighten-3 text-center">
-          <ul class="list-unstyled list-inline font-small mt-3">
-            <li class="list-inline-item white-text"> <!--pr-2-->
-              Stock # {{ item.stockNumber || 'N/A'}}
-            </li>
-          </ul>
 
 
-          <!--<div class="form-check py-2" *ngIf="authService.isAdmin | async">-->
-          <!--<label class="form-check-label">-->
-          <!--<input type="checkbox" class="form-check-input" [checked]="item.commercialTruckTrader"-->
-          <!--(change)="toggleCommericalTruckTrader(item)">-->
-          <!--Commercial Truck Trader-->
-          <!--</label>-->
-          <!--</div>-->
-        </div>
+        <!--<div class="form-check py-2" *ngIf="authService.isAdmin | async">-->
+        <!--<label class="form-check-label">-->
+        <!--<input type="checkbox" class="form-check-input" [checked]="item.commercialTruckTrader"-->
+        <!--(change)="toggleCommericalTruckTrader(item)">-->
+        <!--Commercial Truck Trader-->
+        <!--</label>-->
+        <!--</div>-->
+
+
       </div>
     </div>
   </div>
@@ -146,3 +142,47 @@
     </div>
   </div>
 </div>
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px;" *ngIf="authService.isAdmin | async">
+  <a class="btn-floating btn-large red waves-light" mdbWavesEffect (click)="addModal.show()">
+    <i class="fa fa-plus"></i>
+  </a>
+</div>
+
+<!--Modal: Contact form-->
+<div mdbModal #addModal="mdb-modal" class="modal fade" id="modalAddForm" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog cascading-modal" role="document">
+    <!--Content-->
+    <div class="modal-content">
+
+      <!--Header-->
+      <div class="modal-header light-blue darken-3 white-text">
+        <h4 class="title"><i class="fa fa-pencil"></i>Add New Equipment</h4>
+        <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close"
+                (click)="addModal.hide()">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <!--Body-->
+      <div class="modal-body mb-0">
+        <form [formGroup]="addForm" novalidate (ngSubmit)="add(addForm.value)">
+          <div class="md-form form-sm">
+            <i class="fa fa-clipboard prefix"></i>
+            <input mdbInputDirective type="text" id="stockNumber" class="form-control" formControlName="stockNumber">
+            <label for="stockNumber">Stock Number</label>
+          </div>
+
+          <div class="text-center mt-1-half">
+            <button class="btn btn-info mb-2 waves-light" type="submit" mdbWavesEffect [disabled]="addForm.invalid">
+              Add
+              <i
+                class="fa fa-plus ml-1"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!--/.Content-->
+  </div>
+</div>
+<!--Modal: Add form-->

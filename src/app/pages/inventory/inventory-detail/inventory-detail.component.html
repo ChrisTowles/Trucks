@@ -1,157 +1,85 @@
 <div class="container-fluid" *ngIf="item">
-  <div class="row">
-    <div class="col">
+  <div class="card card-cascade wider reverse">
+    <!-- Card image -->
+    <div class="view overlay">
+      <img *ngIf="imagesBasic.length > 0" class="card-img-top" [src]="imagesBasic[0].img" alt="Card image cap">
+
+
+      <!--<a href="#!">-->
+      <!--<div class="mask rgba-white-slight"></div>-->
+      <!--</a>-->
+    </div>
+    <!-- Card content -->
+    <div class="card-body">
+
       <ol class="breadcrumb mt-2">
         <li class="breadcrumb-item"><a [routerLink]="['']">Inventory</a></li>
         <li class="breadcrumb-item active">{{ item.name }}</li>
       </ol>
-    </div>
-  </div>
-  <h1> {{ item.name }}</h1>
-  <div class="row">
-    <div class="col-12 col-md-6">
-      <div *ngIf="item.video_url" class="embed-responsive embed-responsive-16by9">
-        <iframe class="embed-responsive-item  pb-3"
-                [src]="video_url"
-                allowfullscreen>
-        </iframe>
-      </div>
-      <mdb-image-modal #lightbox [modalImages]="imagesBasic" type="no-margin"></mdb-image-modal>
-    </div>
-    <div class="col-12 col-md-6">
-
-      <h3 *ngIf="item.price"> Price - {{item.price | currency:'USD':'symbol':'1.0-2' }}</h3>
-
-      <h5 class="text-secondary">Specification</h5>
-
-      <div class="row" *ngIf="item.year">
-        <div class="col-6">Year</div>
-        <div class="col-6">{{ item.year }}</div>
-      </div>
-      <div class="row" *ngIf="item.make">
-        <div class="col-6">Make</div>
-        <div class="col-6">{{item.make}}</div>
-      </div>
-      <div class="row" *ngIf="item.model">
-        <div class="col-6">Model</div>
-        <div class="col-6">{{item.model}}</div>
-      </div>
-      <div class="row" *ngIf="item.series">
-        <div class="col-6">Series</div>
-        <div class="col-6">{{item.series}}</div>
-      </div>
-      <div class="row" *ngIf="item.gvwr">
-        <div class="col-6">GVWR</div>
-        <div class="col-6">{{item.gvwr}}</div>
-      </div>
-      <div class="row" *ngIf="item.gvwrClass">
-        <div class="col-6">GVWR Class</div>
-        <div class="col-6">{{item.gvwrClass}}</div>
-      </div>
-      <div class="row" *ngIf="item.engineManufacturer">
-        <div class="col-6">Engine Manufacturer</div>
-        <div class="col-6">{{item.engineManufacturer}}</div>
-      </div>
-      <div class="row" *ngIf="item.engineModel">
-        <div class="col-6">Engine Model</div>
-        <div class="col-6">{{item.engineModel}}</div>
-      </div>
-      <div class="row" *ngIf="item.engineLiters">
-        <div class="col-6">Engine Liters</div>
-        <div class="col-6">{{item.engineLiters}} L</div>
-      </div>
-      <div class="row" *ngIf="item.engineHP">
-        <div class="col-6">Engine HP</div>
-        <div class="col-6">{{item.engineHP}}</div>
-      </div>
-      <div class="row" *ngIf="item.engineCylinders">
-        <div class="col-6">Engine Cylinders</div>
-        <div class="col-6">{{item.engineCylinders}}</div>
-      </div>
-      <div class="row" *ngIf="item.fuelType">
-        <div class="col-6">Fuel Type</div>
-        <div class="col-6">{{item.fuelType}}</div>
-      </div>
-      <div class="row" *ngIf="item.transmissionManufacturer">
-        <div class="col-6">Transmission Manufacturer</div>
-        <div class="col-6">{{item.transmissionManufacturer}}</div>
-      </div>
-      <div class="row" *ngIf="item.transmission">
-        <div class="col-6">Transmission</div>
-        <div class="col-6">{{item.transmission}}</div>
-      </div>
-      <div class="row" *ngIf="item.driveType">
-        <div class="col-6">Drive Type</div>
-        <div class="col-6">{{item.driveType}}</div>
-      </div>
-      <div class="row" *ngIf="item.numberRearAxles">
-        <div class="col-6">Number Rear Axles</div>
-        <div class="col-6">{{item.numberRearAxles}}</div>
-      </div>
-
-      <div class="row" *ngIf="item.frontTireSize">
-        <div class="col-6">Front Tire Size</div>
-        <div class="col-6">{{item.frontTireSize}}</div>
-      </div>
-      <div class="row" *ngIf="item.rearTireSize">
-        <div class="col-6">Rear Tire Size</div>
-        <div class="col-6">{{item.rearTireSize}}</div>
-      </div>
-      <div class="row" *ngIf="item.suspension">
-        <div class="col-6">Suspension</div>
-        <div class="col-6">{{item.suspension}}</div>
-      </div>
-      <div class="row" *ngIf="item.rearEndRatio">
-        <div class="col-6">Rear End Ratio</div>
-        <div class="col-6">{{item.rearEndRatio}}</div>
-      </div>
-      <div class="row" *ngIf="item.bedDimensions">
-        <div class="col-6">Bed Dimensions</div>
-        <div class="col-6">{{item.bedDimensions}}</div>
-      </div>
-      <div class="row" *ngIf="item.wheelBase">
-        <div class="col-6">Wheel Base</div>
-        <div class="col-6">{{item.wheelBase}}</div>
-      </div>
-      <div class="row" *ngIf="item.odometer">
-        <div class="col-6">Mileage</div>
-        <div class="col-6">{{item.odometer | number }}</div>
-      </div>
-      <div class="row" *ngIf="item.brakeType">
-        <div class="col-6">Brake Type</div>
-        <div class="col-6">{{item.brakeType}}</div>
-      </div>
-      <!--<div class="row" *ngIf="item.vin">-->
-      <!--<div class="col-6">Vin</div>-->
-      <!--<div class="col-6">{{item.vin}}</div>-->
-      <!--</div>-->
-
-      <h5 class="text-secondary pt-2" *ngIf="options.length > 0">Features</h5>
-      <ul *ngIf="options.length > 0">
-        <li *ngFor="let o of options">{{ o }}</li>
-      </ul>
-
-      <h5 class="text-secondary pt-2" *ngIf="item.comments">Description</h5>
-      <p *ngIf="item.comments">
-        {{item.comments}}
-      </p>
-
+      <h1 class="h1-responsive card-title">{{ item.name }}</h1>
+      <h3 class="h3-responsive">{{ item.category }}</h3>
+      <hr>
       <div class="row">
-        <div class="col">
-          <p class="pull-right text-muted">Stock # {{item.stockNumber}}</p>
+        <div class="col-12 col-md-6">
+
+          <h3 class="h3-responsive" *ngIf="item.price">{{item.price | currency:'USD':'symbol':'1.0-2' }}</h3>
+          <ng-template ngFor let-spec [ngForOf]="allSpecs" let-i="index">
+            <div *ngIf="spec.value">
+              <span class="text-muted">{{spec.text}}</span>
+              <span class="font-weight-bold pull-right text-overflow">{{spec.value}}</span>
+            </div>
+          </ng-template>
+
+          <hr *ngIf="options.length > 0">
+          <h5 class="h5-responsive" *ngIf="options.length > 0">Features</h5>
+          <ul *ngIf="options.length > 0">
+            <li *ngFor="let o of options">{{ o }}</li>
+          </ul>
+
+          <hr>
+          <h5 class="h5-responsive" *ngIf="item.comments">Description</h5>
+          <p *ngIf="item.comments">
+            {{item.comments}}
+          </p>
+
+          <p class="text-muted">Stock # {{item.stockNumber}}</p>
+
+
+          <!--<a class="btn btn-primary btn-block waves-light" mdbWavesEffect [routerLink]="['/contact']"-->
+          <!--[queryParams]="{subject: item.stockNumber ? 'Interest in #' + item.stockNumber: ''}">Contact Us-->
+          <!--</a>-->
+          <hr>
+          <p>
+            Give us a call <a href="tel:1-502-463-2233">1-(502)-463-2233</a> or send a
+            <a [routerLink]="['/contact']"
+               [queryParams]="{subject: item.stockNumber ? 'Interest in #' + item.stockNumber: ''}">message.
+            </a>
+          </p>
+
+
         </div>
+        <div class="col-12 col-md-6 order-md-0">
+          <div *ngIf="item.video_url" class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item  pb-3"
+                    [src]="video_url"
+                    allowfullscreen>
+            </iframe>
+          </div>
+          <mdb-image-modal #lightbox [modalImages]="imagesBasic" type="margin" [smooth]="true"></mdb-image-modal>
+        </div>
+
       </div>
-
-      <a class="btn btn-primary btn-block" [routerLink]="['/contact']"
-         [queryParams]="{subject: item.stockNumber ? 'Interest in #' + item.stockNumber: ''}">Contact Us
-      </a>
-
-      <div class="btn-group d-flex pt-2" *ngIf="authService.isAdmin | async">
-        <a class="btn btn-primary w-100" [routerLink]="['edit']">Edit</a>
-        <button type="button" class="btn btn-danger w-100" (click)="delete()">Delete</button>
-      </div>
-
     </div>
   </div>
-</div>
 
+</div>
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px;" *ngIf="authService.isAdmin | async">
+  <a class="btn-floating btn-large red waves-light" mdbWavesEffect [routerLink]="['edit']">
+    <i class="fa fa-edit"></i>
+  </a>
+</div>
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px;" *ngIf="!(authService.isAdmin | async)">
+  <a class="btn-floating btn-large red waves-light" mdbWavesEffect href="tel:1-502-463-2233">
+    <i class="fa fa-phone"></i>
+  </a>
+</div>

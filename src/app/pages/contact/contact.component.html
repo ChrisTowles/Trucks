@@ -2,7 +2,7 @@
   <section>
 
     <!--Section heading-->
-    <h1 class="h1">Contact us</h1>
+    <h1 class="h1-responsive">Contact us</h1>
     <!--Section description-->
     <p class="pb-4">We’re approximately 50 minutes north of Louisville and about 45 minutes south of Cincinnati. We are
       just outside
@@ -21,7 +21,7 @@
           <div class="card-body">
             <!--Header-->
             <div class="form-header blue accent-1">
-              <h3>
+              <h3 class="h3-responsive">
                 <i class="fa fa-envelope"></i> Write to us:</h3>
             </div>
 
@@ -86,7 +86,7 @@
               </div>
 
               <div class="text-center">
-                <button class="btn btn-light-blue btn-lg btn-block waves-light" mdbWavesEffect
+                <button type="submit" class="btn btn-blue btn-lg btn-block waves-light" mdbWavesEffect
                         [disabled]="contactForm.invalid">Submit
                 </button>
               </div>
@@ -107,14 +107,16 @@
 
         <!--Google map-->
         <agm-map class="z-depth-1-half map-container" style="height: 400px;" [latitude]="map.lat" [longitude]="map.lng">
-          <agm-marker [latitude]="map.lat" [longitude]="map.lng"></agm-marker>
+          <agm-marker [latitude]="map.lat" [longitude]="map.lng" [label]="'Craigmyle Truck\n& Trailer'"></agm-marker>
         </agm-map>
 
         <br>
         <!--Buttons-->
         <div class="row text-center">
           <div class="col-md-4">
-            <a class="btn-floating blue accent-1 waves-light" mdbWavesEffect>
+            <a class="btn-floating blue accent-1 waves-light" mdbWavesEffect
+               href="http://maps.apple.com/?q=Craigmyle+Trucks,35+KY-35,+Sparta,+KY+41086"
+               target="_blank">
               <i class="fa fa-map-marker"></i>
             </a>
             <address class="text-center">
